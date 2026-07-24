@@ -9,6 +9,11 @@ void GLRenderer::setTargets(std::initializer_list<std::pair<const Shader&, const
         m_renderData[&targ.first].push_back(&targ.second);
 }
 
+void GLRenderer::setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc) {
+
+    m_forModelFunc = std::move(forModelFunc);
+}
+
 void GLRenderer::callbackUniforms() const {
 
     if (m_uniformData.empty())
@@ -38,7 +43,9 @@ void GLRenderer::callbackRender() const {
 
         for (const auto& model : models) {
 
-            shader->setUniform(8, model->getModelMat());
+            if (m_forModelFunc)
+                m_forModelFunc(shader, model);
+            
             model->render(*shader);
         }
     }
