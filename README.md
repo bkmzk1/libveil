@@ -1,4 +1,14 @@
-A wrapper for OpenGL and Assimp with caching.
+
+# Veil
+## A wrapper for GLFW, OpenGL and Assimp with caching.
+
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20x64-0078D6?logo=windows&logoColor=white)
+![License](https://img.shields.io/badge/license-Unlicense-blue)
+![Build](https://img.shields.io/badge/build-passing%20(local%20only)-brightgreen)
+![Source](https://img.shields.io/badge/source-reference%20only-lightgrey)
 
 > [!WARNING]
-> CMakeLists provided will not work on a local environment. Do not try to compile this repo on your local environment. This repo is a public source display.
+> The provided CMakeLists.txt is not configured for local builds. This repository is intended as a public source reference only — do not attempt to compile it locally.
+
+> [!IMPORTANT]
+> Development and testing currently target Windows 10 x64 exclusively. Other operating systems (Linux, BSD, macOS, etc.) are untested and unsupported at this time — compatibility is not guaranteed
