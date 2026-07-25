@@ -11,27 +11,32 @@
 
 namespace veil {
 
-struct VEIL_EXPORT GLCamera {
-    
-    GLCamera() = delete;
-    GLCamera(const Vector2& size, const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg);
-    ~GLCamera() = default;
+class VEIL_EXPORT GLCamera {
+    public: 
+        GLCamera() = delete;
+        GLCamera(const Vector2& size, const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg);
+        ~GLCamera() = default;
 
-    void calculateAttitude(double xpos, double ypos);
-    void updateView();
-    void updateProjection(float fovyDeg, float aspectRatio);
+        Vector3 m_position;
+        Vector3 m_up;
 
-    Vector3 m_position;
-    Vector3 m_up;
-    Matrix4 m_projection;
-    Matrix4 m_view;
+        void calculateAttitude(double xpos, double ypos);
+        void updateView();
+        void updateProjection(float fovyDeg, float aspectRatio);
 
-    float m_yaw = -90.0f;
-    float m_pitch = 0.0f;
-    double m_lastx;
-    double m_lasty;
+        const Matrix4& getProjection() const { return m_projection; }
+        const Matrix4& getView() const { return m_view; }
 
-    bool firstMovement = true;
+    private:
+        Matrix4 m_projection;
+        Matrix4 m_view;
+
+        float m_yaw = -90.0f;
+        float m_pitch = 0.0f;
+        double m_lastx;
+        double m_lasty;
+
+        bool firstMovement = true;
 
 }; //class GLCamera
 

@@ -13,5 +13,5 @@
 #include "veil/math.hpp"
 
 //TODO: Make shader optimizations 
-//TODO: Improve math
 //TODO: Camera class or struct?
+//TODO: Add warnings and noncritical errors
