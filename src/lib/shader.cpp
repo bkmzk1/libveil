@@ -120,13 +120,13 @@ void Shader::setUniform(int location, const glm::mat4& mat) const {
     glProgramUniformMatrix4fv(m_shaderProgram, location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 void Shader::setUniform(int location, const Vector3& vec) const {
-    glProgramUniform3f(m_shaderProgram, location, vec.data.x, vec.data.y, vec.data.z);
+    glProgramUniform3f(m_shaderProgram, location, vec.x, vec.y, vec.z);
 }
 void Shader::setUniform(int location, const Vector2& vec) const {
-    glProgramUniform2f(m_shaderProgram, location, vec.data.x, vec.data.y);
+    glProgramUniform2f(m_shaderProgram, location, vec.x, vec.y);
 }
 void Shader::setUniform(int location, const Matrix4& mat) const {
-    glProgramUniformMatrix4fv(m_shaderProgram, location, 1, GL_FALSE, glm::value_ptr(mat.data));
+    glProgramUniformMatrix4fv(m_shaderProgram, location, 1, GL_FALSE, glm::value_ptr(static_cast<Matrix4::Base>(mat)));
 }
 
 } //namespace veil

@@ -11,9 +11,9 @@
 namespace veil {
 
 struct VEIL_EXPORT Vertex {
-    Vector3 position;
-    Vector3 normal;
-    Vector2 texuv;
+    Vector3 position = { 0.0f, 0.0f, 0.0f };
+    Vector3 normal = { 0.0f, 0.0f, 0.0f };
+    Vector2 texuv = { 0.0f, 0.0f };
 
 }; //struct Vertex
 

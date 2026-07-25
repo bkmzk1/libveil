@@ -67,25 +67,25 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         Vertex vertex;
         Vector3 vector;
 
-        vector.data.x = mesh->mVertices[i].x;
-        vector.data.y = mesh->mVertices[i].y;
-        vector.data.z = mesh->mVertices[i].z;
+        vector.x = mesh->mVertices[i].x;
+        vector.y = mesh->mVertices[i].y;
+        vector.z = mesh->mVertices[i].z;
         vertex.position = vector;
 
-        vector.data.x = mesh->mNormals[i].x;
-        vector.data.y = mesh->mNormals[i].y;
-        vector.data.z = mesh->mNormals[i].z;
+        vector.x = mesh->mNormals[i].x;
+        vector.y = mesh->mNormals[i].y;
+        vector.z = mesh->mNormals[i].z;
         vertex.normal = vector;
 
         if (mesh->mTextureCoords[0]) {
 
             Vector2 uv;
-            uv.data.x = mesh->mTextureCoords[0][i].x;
-            uv.data.y = mesh->mTextureCoords[0][i].y;
+            uv.x = mesh->mTextureCoords[0][i].x;
+            uv.y = mesh->mTextureCoords[0][i].y;
             vertex.texuv = uv;
         }
         else 
-            vertex.texuv = Vector2({0.0f, 0.0f});
+            vertex.texuv = Vector2(0.0f, 0.0f);
 
         vertices.push_back(vertex);
     }
@@ -117,10 +117,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 ModelInstance::ModelInstance(const Model& base) : m_base(base) {
     
-    m_modelMatrix.makeUnitMat();
+    m_modelMatrix = Matrix4(1.0f);
     //TEMP
     //m_modelMatrix.rotateMat(-90.0f, Vector3({1.0f, 0.0f, 0.0f}));
-    m_modelMatrix.scaleMat(Vector3({50.0f, 50.0f, 50.0f}));
+    m_modelMatrix.scale(Vector3(50.0f, 50.0f, 50.0f));
 }
 
 void ModelInstance::render(const Shader& shader) const {

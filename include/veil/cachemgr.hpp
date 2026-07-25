@@ -35,6 +35,7 @@ class VEIL_EXPORT TextureStorage {
         std::unordered_map<std::string, Texture> m_cache;
 
         GLuint loadTextureFromFile(std::string_view path) const;
+        
 }; //class TextureStorage
 
 class VEIL_EXPORT ModelStorage {

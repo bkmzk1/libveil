@@ -8,11 +8,11 @@ GLCamera::GLCamera(const Vector2& size, const Vector3& initPos, const Vector3& u
     m_position = initPos;
     m_up = up;
 
-    m_projection.makeProjectionMat(fovyDeg, aspectRatio, 0.1f, 500.0f);
-    m_view.makeUnitMat(1.0f);
+    m_projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
+    m_view = Matrix4(1.0f);
 
-    m_lastx = size.data.x / 2.0f;
-    m_lasty = size.data.y / 2.0f;
+    m_lastx = size.x / 2.0f;
+    m_lasty = size.y / 2.0f;
 
     updateView();
 }
@@ -45,15 +45,15 @@ void GLCamera::updateView() {
     float y = std::sin(glm::radians(m_pitch));
     float z = std::sin(glm::radians(m_yaw)) * std::cos(glm::radians(m_pitch));
 
-    Vector3 forward({x, y, z});
-    forward.normalizeVec();
+    Vector3 forward(x, y, z);
+    forward.normalized();
 
-    m_view.makeViewMat(m_position, m_position + forward, m_up);
+    m_view.makeView(m_position, m_position + forward, m_up);
 }
 
 void GLCamera::updateProjection(float fovyDeg, float aspectRatio) {
 
-    m_projection.makeProjectionMat(fovyDeg, aspectRatio, 0.1f, 500.0f);
+    m_projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
 }
 
 }; //namespace veil
