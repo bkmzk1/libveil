@@ -26,9 +26,9 @@ Window::Window(std::string_view title, int width, int height) {
     glfwSwapInterval(1);
 
     #ifdef _WIN32
-    VEIL_INIT_OPENGL_DRV // WIN32 glad needs this macro to run explicitely in the .dll code
-                         // or else glad function pointers will be 0x0
-                         // THE CODE HAS NOT BEEN TESTED ON LINUX YET
+    veil::initOpenGLDriver(); // WIN32 glad needs this macro to run explicitely in the .dll code
+                              // or else glad function pointers will be 0x0
+                              // THE CODE HAS NOT BEEN TESTED ON LINUX YET
     #endif 
 
     glViewport(0, 0, width, height);

@@ -93,16 +93,14 @@ ModelStorage& ModelStorage::getInstance() {
     return ms;
 } 
 
-void ModelStorage::loadModel(const std::string& path) {
-
-    if (path.empty() || path == "\0")
-        return;
+ModelInstance ModelStorage::loadModel(const std::string& path) {
     
     auto it = m_cache.find(path);
     if (it != m_cache.end())
-        return;
+        return ModelInstance(this->getExisting(path));
     
     m_cache.try_emplace(path, Model(path));
+    return ModelInstance(this->getExisting(path));
 } 
 
 ModelInstance ModelStorage::getExisting(const std::string& path) const {

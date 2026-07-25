@@ -17,10 +17,11 @@
 
 namespace veil {
 
-#define VEIL_INIT_OPENGL_RENDER_FLAGS \
-    glEnable(GL_DEPTH_TEST); \
+inline void initRenderingFlags() {
+
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE); 
-//VEIL_INIT_OPENGL_RENDER_FLAGS
+}
 
 class VEIL_EXPORT GLRenderer {
     public:
