@@ -45,8 +45,9 @@ class VEIL_EXPORT Model {
 
 class VEIL_EXPORT ModelInstance {
     public:
+        ModelInstance() = delete;
         ModelInstance(const Model& base);
-
+        
         ModelInstance(const ModelInstance&) = delete;
         ModelInstance& operator=(const ModelInstance&) = delete;
         ModelInstance(ModelInstance&&) noexcept = default;
@@ -55,6 +56,10 @@ class VEIL_EXPORT ModelInstance {
 
         void render(const Shader& shader) const;
 
+        void translate(const Vector3& translationVec);
+        void rotate(float deg, const Vector3& rotateDir);
+        void scale(const Vector3& scaleRatio);
+
         inline const Model& getBase() const { return m_base; }
         inline const Matrix4& getModelMat() const { return m_modelMatrix; }
 
@@ -62,5 +67,25 @@ class VEIL_EXPORT ModelInstance {
         const Model& m_base;
         Matrix4 m_modelMatrix;
 }; //class ModelInstance
+
+class VEIL_EXPORT InstancedModels {
+    public:
+        InstancedModels(const Model& base, size_t maxInstances);
+        InstancedModels(const InstancedModels&) = delete;
+        InstancedModels& operator=(const InstancedModels&) = delete;
+        InstancedModels(InstancedModels&&) noexcept = default;
+        InstancedModels& operator=(InstancedModels&&) noexcept = default;
+        ~InstancedModels();
+
+        void setInstances(std::span<const Matrix4> instances);
+
+        void render(const Shader& shader) const;
+
+    private:
+        const Model& m_base; 
+        GLuint m_instancesVBO = 0;
+        size_t m_maxInstances = 0;
+        size_t m_instancesSize = 0;
+}; //class InstancedModels
 
 }; //namespace veil

@@ -1,5 +1,4 @@
 
-# Veil
 ## A wrapper for GLFW, OpenGL and Assimp with caching.
 
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20x64-0078D6?logo=windows&logoColor=white)

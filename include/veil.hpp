@@ -13,5 +13,7 @@
 #include "veil/math.hpp"
 
 //TODO: Make shader optimizations 
-//TODO: Camera class or struct?
 //TODO: Add warnings and noncritical errors
+//TODO: Model rotate translate etc
+//TODO: Instanced rendering
+//TODO: Window events

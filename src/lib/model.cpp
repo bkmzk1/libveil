@@ -118,14 +118,65 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 ModelInstance::ModelInstance(const Model& base) : m_base(base) {
     
     m_modelMatrix = Matrix4(1.0f);
-    //TEMP
-    //m_modelMatrix.rotateMat(-90.0f, Vector3({1.0f, 0.0f, 0.0f}));
-    m_modelMatrix.scale(Vector3(50.0f, 50.0f, 50.0f));
 }
 
 void ModelInstance::render(const Shader& shader) const {
 
     m_base.render(shader);
+}
+
+void ModelInstance::translate(const Vector3& translationVec) {
+    m_modelMatrix.translate(translationVec);
+}
+void ModelInstance::rotate(float deg, const Vector3& rotateDir) {
+    m_modelMatrix.rotate(deg, rotateDir);
+}
+void ModelInstance::scale(const Vector3& scaleRatio) {
+    m_modelMatrix.scale(scaleRatio);
+}
+
+InstancedModels::InstancedModels(const Model& base, size_t maxInstances) : m_base(base) {
+
+    glCreateBuffers(1, &m_instancesVBO);
+    glNamedBufferData(m_instancesVBO, maxInstances * sizeof(Matrix4), nullptr, GL_STATIC_DRAW);
+
+    for (const auto& mesh : base.getMeshesRead()) {
+
+        GLuint vao = mesh.getVAO();
+
+        glVertexArrayVertexBuffer(vao, 1, m_instancesVBO, 0, sizeof(Matrix4));
+        glVertexArrayBindingDivisor(vao, 1, 1);
+
+        for (int i = 0; i < 4; ++i) {
+
+            GLuint loc = 3 + i;
+            glEnableVertexArrayAttrib(vao, loc);
+            glVertexArrayAttribBinding(vao, loc, 1);
+            glVertexArrayAttribFormat(vao, loc, 4, GL_FLOAT, GL_FALSE, i * sizeof(Vector4));
+        }
+    }
+}
+
+InstancedModels::~InstancedModels() {
+
+    if (m_instancesVBO)
+        glDeleteBuffers(1, &m_instancesVBO);
+}
+
+void InstancedModels::setInstances(std::span<const Matrix4> instances) {
+
+    m_instancesSize = instances.size();
+
+    glNamedBufferSubData(m_instancesVBO, 0, instances.size() * sizeof(Matrix4), &instances[0]);
+}
+
+void InstancedModels::render(const Shader& shader) const {
+
+    for (const auto& mesh : m_base.getMeshesRead()) {
+
+        glBindVertexArray(mesh.getVAO());
+        glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesSize);
+    }
 }
 
 }; //namespace veil

@@ -113,6 +113,16 @@ ModelInstance ModelStorage::getExisting(const std::string& path) const {
     return ModelInstance(it->second);
 }
 
+const Model& ModelStorage::getReference(const std::string& path) const {
+
+    auto it = m_cache.find(path);
+
+    if (it == m_cache.end())
+        throw veil::Exception(std::format("No existing model found '{}'", path));
+
+    return it->second;
+}
+
 void ModelStorage::shutdown() {
 
     auto& instance = getInstance();
