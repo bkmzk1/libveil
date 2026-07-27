@@ -11,6 +11,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "assets.hpp"
 #include "shader.hpp"
 #include "mesh.hpp"
 #include "cachemgr.hpp"
@@ -22,10 +23,13 @@ namespace veil {
 class VEIL_EXPORT Model {
     public:
         explicit Model(std::string_view path);
+        
         Model(const Model&) = delete;
         Model& operator=(const Model&) = delete;
+
         Model(Model&&) noexcept = default;
         Model& operator=(Model&&) noexcept = default;
+
         ~Model() = default;
         
         void render(const Shader& shader) const; 
@@ -43,18 +47,20 @@ class VEIL_EXPORT Model {
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 }; //class Model
 
-class VEIL_EXPORT ModelInstance {
+class VEIL_EXPORT ModelInstance : public util::IDrawable {
     public:
         ModelInstance() = delete;
         ModelInstance(const Model& base);
         
         ModelInstance(const ModelInstance&) = delete;
         ModelInstance& operator=(const ModelInstance&) = delete;
+
         ModelInstance(ModelInstance&&) noexcept = default;
         ModelInstance& operator=(ModelInstance&&) noexcept = default;
-        ~ModelInstance() = default;
 
-        void render(const Shader& shader) const;
+        virtual ~ModelInstance() = default;
+
+        void render(const Shader& shader) const override;
 
         void translate(const Vector3& translationVec);
         void rotate(float deg, const Vector3& rotateDir);
@@ -63,12 +69,14 @@ class VEIL_EXPORT ModelInstance {
         inline const Model& getBase() const { return m_base; }
         inline const Matrix4& getModelMat() const { return m_modelMatrix; }
 
+        inline util::DrawableType getType() const override { return util::DrawableType::MODEL_SINGULAR; }
+
     private:
         const Model& m_base;
         Matrix4 m_modelMatrix;
 }; //class ModelInstance
 
-class VEIL_EXPORT InstancedModels {
+class VEIL_EXPORT InstancedModels : public util::IDrawable {
     public:
         InstancedModels(const Model& base, size_t maxInstances, GLuint modelUniformLocation);
 
@@ -78,11 +86,13 @@ class VEIL_EXPORT InstancedModels {
         InstancedModels(InstancedModels&&) noexcept;
         InstancedModels& operator=(InstancedModels&&) noexcept;
 
-        ~InstancedModels();
+        virtual ~InstancedModels();
 
         void setInstances(std::span<const Matrix4> instances);
 
-        void render(const Shader& shader) const;
+        void render(const Shader& shader) const override;
+
+        inline util::DrawableType getType() const override { return util::DrawableType::MODEL_INSTANCED; }
 
     private:
         const Model& m_base; 

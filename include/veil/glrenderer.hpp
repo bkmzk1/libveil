@@ -34,9 +34,9 @@ class VEIL_EXPORT GLRenderer {
 
         ~GLRenderer() = default;
 
-        void setTargets(std::initializer_list<std::pair<const Shader&, const ModelInstance&>> targets);
-        void setTargets(std::initializer_list<std::pair<const Shader&, const InstancedModels&>> targets);
         void setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc);
+
+        void addTargets(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets);
 
         template<typename T> 
         void uploadUniform(const Shader& shader, std::string_view uniformName, T&& v) {
@@ -62,6 +62,12 @@ class VEIL_EXPORT GLRenderer {
                 });
         }
         template<typename T>
+        void uploadUniformUniversal(std::string_view uniformName, T&& v) {
+
+            for (const auto& data : m_renderData) 
+                uploadUniform(*data.first, uniformName, std::move(v));
+        }
+        template<typename T>
         void setUniformDirect(const Shader& shader, std::string_view uniformName, const T& v) {
             
             GLint location = glGetUniformLocation(shader.getID(), uniformName.data());
@@ -80,15 +86,9 @@ class VEIL_EXPORT GLRenderer {
     private:
         std::unordered_map<
             const Shader*, 
-            std::vector<const ModelInstance*> 
+            std::vector<const util::IDrawable*> 
 
         > m_renderData;
-
-        std::unordered_map<
-            const Shader*,
-            std::vector<const InstancedModels*>
-            
-        > m_instancedRenderData;
 
         std::unordered_map<
             const Shader*, 
