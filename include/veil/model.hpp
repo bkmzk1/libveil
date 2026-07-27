@@ -70,11 +70,14 @@ class VEIL_EXPORT ModelInstance {
 
 class VEIL_EXPORT InstancedModels {
     public:
-        InstancedModels(const Model& base, size_t maxInstances);
+        InstancedModels(const Model& base, size_t maxInstances, GLuint modelUniformLocation);
+
         InstancedModels(const InstancedModels&) = delete;
         InstancedModels& operator=(const InstancedModels&) = delete;
-        InstancedModels(InstancedModels&&) noexcept = default;
-        InstancedModels& operator=(InstancedModels&&) noexcept = default;
+
+        InstancedModels(InstancedModels&&) noexcept;
+        InstancedModels& operator=(InstancedModels&&) noexcept;
+
         ~InstancedModels();
 
         void setInstances(std::span<const Matrix4> instances);
@@ -83,9 +86,10 @@ class VEIL_EXPORT InstancedModels {
 
     private:
         const Model& m_base; 
+
         GLuint m_instancesVBO = 0;
         size_t m_maxInstances = 0;
-        size_t m_instancesSize = 0;
+        size_t m_instancesCount = 0;
 }; //class InstancedModels
 
 }; //namespace veil

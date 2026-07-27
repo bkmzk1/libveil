@@ -14,6 +14,4 @@
 
 //TODO: Make shader optimizations 
 //TODO: Add warnings and noncritical errors
-//TODO: Model rotate translate etc
-//TODO: Instanced rendering
 //TODO: Window events

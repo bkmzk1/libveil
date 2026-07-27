@@ -35,6 +35,7 @@ class VEIL_EXPORT GLRenderer {
         ~GLRenderer() = default;
 
         void setTargets(std::initializer_list<std::pair<const Shader&, const ModelInstance&>> targets);
+        void setTargets(std::initializer_list<std::pair<const Shader&, const InstancedModels&>> targets);
         void setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc);
 
         template<typename T> 
@@ -82,6 +83,12 @@ class VEIL_EXPORT GLRenderer {
             std::vector<const ModelInstance*> 
 
         > m_renderData;
+
+        std::unordered_map<
+            const Shader*,
+            std::vector<const InstancedModels*>
+            
+        > m_instancedRenderData;
 
         std::unordered_map<
             const Shader*, 

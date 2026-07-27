@@ -135,7 +135,9 @@ void ModelInstance::scale(const Vector3& scaleRatio) {
     m_modelMatrix.scale(scaleRatio);
 }
 
-InstancedModels::InstancedModels(const Model& base, size_t maxInstances) : m_base(base) {
+InstancedModels::InstancedModels(const Model& base, size_t maxInstances, GLuint modelUniformLocation) : m_base(base) {
+
+    m_maxInstances = maxInstances;
 
     glCreateBuffers(1, &m_instancesVBO);
     glNamedBufferData(m_instancesVBO, maxInstances * sizeof(Matrix4), nullptr, GL_STATIC_DRAW);
@@ -149,12 +151,36 @@ InstancedModels::InstancedModels(const Model& base, size_t maxInstances) : m_bas
 
         for (int i = 0; i < 4; ++i) {
 
-            GLuint loc = 3 + i;
+            GLuint loc = modelUniformLocation + i;
             glEnableVertexArrayAttrib(vao, loc);
             glVertexArrayAttribBinding(vao, loc, 1);
             glVertexArrayAttribFormat(vao, loc, 4, GL_FLOAT, GL_FALSE, i * sizeof(Vector4));
         }
     }
+}
+
+InstancedModels::InstancedModels(InstancedModels&& other) noexcept : m_base(std::move(other.m_base)) {
+
+    m_instancesVBO = other.m_instancesVBO;
+    m_maxInstances = other.m_maxInstances;
+    m_instancesCount = other.m_instancesCount;
+
+    other.m_instancesVBO = 0;
+}
+
+InstancedModels& InstancedModels::operator=(InstancedModels&& other) noexcept {
+
+    if (this != &other) {
+
+        glDeleteBuffers(1, &m_instancesVBO);
+
+        m_instancesVBO = other.m_instancesVBO;
+        m_maxInstances = other.m_maxInstances;
+        m_instancesCount = other.m_instancesCount;
+
+        other.m_instancesVBO = 0;
+    }
+    return *this;
 }
 
 InstancedModels::~InstancedModels() {
@@ -165,17 +191,24 @@ InstancedModels::~InstancedModels() {
 
 void InstancedModels::setInstances(std::span<const Matrix4> instances) {
 
-    m_instancesSize = instances.size();
+    if (instances.size() > m_maxInstances)
+        throw veil::Exception(std::format("Too many instances '{}' ", instances.size()));
 
-    glNamedBufferSubData(m_instancesVBO, 0, instances.size() * sizeof(Matrix4), &instances[0]);
+    m_instancesCount = instances.size();
+    glNamedBufferSubData(m_instancesVBO, 0, m_instancesCount * sizeof(Matrix4), &instances[0]);
 }
 
 void InstancedModels::render(const Shader& shader) const {
 
     for (const auto& mesh : m_base.getMeshesRead()) {
 
+        const Material& material = mesh.getMaterial();
+
         glBindVertexArray(mesh.getVAO());
-        glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesSize);
+        glBindTextureUnit(0, material.diffuse.id);
+        glBindTextureUnit(1, material.specular.id);
+
+        glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
     }
 }
 
