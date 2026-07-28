@@ -39,7 +39,18 @@ struct VEIL_EXPORT Log {
         }
 
     private:
-        constexpr static std::string typeToString(LogType type);
+        constexpr static std::string typeToString(LogType type) {
+
+            constexpr std::array<std::string, static_cast<size_t>(LogType::COUNT)> names = {
+                "INFO",
+                "WARNING",
+                "CRITICAL"
+            };
+            auto index = static_cast<size_t>(type);
+            if (index >= names.size())
+                return "UNKNOWN";
+            return names[index];
+        }
 }; //class Log
 
 class VEIL_EXPORT LogTimer {
