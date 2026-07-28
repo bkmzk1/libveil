@@ -9,8 +9,11 @@ namespace veil {
 
 Texture TextureStorage::loadTexture(const std::string& path) {
 
-    if (path.empty() || path == "\0")
+    if (path.empty() || path == "\0") {
+
+        std::cout << Log::message(LogType::WARNING, "Tried to load a texture with no path") << std::endl;
         return Texture{0, "\0"};
+    }
 
     auto it = m_cache.find(path);
     if (it != m_cache.end())
@@ -51,7 +54,7 @@ GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
     if (!data) {
 
         stbi_image_free(data);
-        throw veil::Exception(std::format("Failed to load texture data at {}", path));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load texture at {}", path));
         return 0;
     }
 
@@ -108,7 +111,7 @@ ModelInstance ModelStorage::getExisting(const std::string& path) const {
     auto it = m_cache.find(path);
 
     if (it == m_cache.end())
-        throw veil::Exception(std::format("No existing model found '{}'", path));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load model at {}", path));
 
     return ModelInstance(it->second);
 }
@@ -118,7 +121,7 @@ const Model& ModelStorage::getReference(const std::string& path) const {
     auto it = m_cache.find(path);
 
     if (it == m_cache.end())
-        throw veil::Exception(std::format("No existing model found '{}'", path));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "No existing model found '{}'", path));
 
     return it->second;
 }
@@ -140,7 +143,7 @@ void ModelStorage::saveToBIN(const Model& model) const {
 
     std::ofstream out(cacheFile, std::ios::binary);
     if (!out.is_open())
-        throw veil::Exception(std::format("Unable to open {}", cacheFile));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile));
 
     size_t totalBytes = sizeof(unsigned int);
 
@@ -203,7 +206,7 @@ void ModelStorage::loadFromBIN(Model& model) {
 
     std::ifstream in(cacheFile, std::ios::binary | std::ios::ate);
     if (!in.is_open()) 
-        throw veil::Exception(std::format("Unable to open {}", cacheFile));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile));
 
     std::streamsize fileSize = in.tellg();
     in.seekg(0, std::ios::beg);

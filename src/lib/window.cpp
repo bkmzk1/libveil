@@ -17,7 +17,7 @@ Window::Window(std::string_view title, int width, int height) {
     m_window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
     if (!m_window) {
         glfwTerminate();
-        throw veil::Exception("Failed to create GLFW window");
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to create GLFW window"));
     }
 
     glfwMakeContextCurrent(m_window);
@@ -65,6 +65,8 @@ void Window::startUpdateLoop() {
     if (!m_loopFunc)
         return;
     
+    glfwSwapInterval(1);
+
     while (!this->shouldClose()) {
 
         this->pollEvents();

@@ -192,7 +192,7 @@ InstancedModels::~InstancedModels() {
 void InstancedModels::setInstances(std::span<const Matrix4> instances) {
 
     if (instances.size() > m_maxInstances)
-        throw veil::Exception(std::format("Too many instances '{}' ", instances.size()));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Too many instances '{}' ", instances.size()));
 
     m_instancesCount = instances.size();
     glNamedBufferSubData(m_instancesVBO, 0, m_instancesCount * sizeof(Matrix4), &instances[0]);

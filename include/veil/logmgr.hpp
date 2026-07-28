@@ -8,8 +8,39 @@
 #include <format>
 #include <source_location>
 #include <stdexcept>
+#include <array>
+#include <string_view>
 
 namespace veil {
+
+enum class LogType : uint8_t {
+    INFO,
+    WARNING,
+    CRITICAL,
+    COUNT
+};
+
+struct VEIL_EXPORT Log {
+    public:
+        Log() = delete;
+        Log(const Log&) = delete;
+        Log& operator=(const Log&) = delete;
+        Log(Log&&) = delete;
+        Log& operator=(Log&&) = delete;
+        ~Log() = default;
+
+        template<typename... Args>
+        static std::string message(LogType type, std::format_string<Args...> fmt, Args&&... args) {
+
+            std::string formatted = std::format(fmt, std::forward<Args>(args)...);
+            std::string msg = "VEIL::" + typeToString(type) + ": " + formatted;
+
+            return msg;
+        }
+
+    private:
+        constexpr static std::string typeToString(LogType type);
+}; //class Log
 
 class VEIL_EXPORT LogTimer {
     public:

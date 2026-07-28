@@ -3,14 +3,31 @@
 
 namespace veil {
 
+
+constexpr std::string Log::typeToString(LogType type) {
+
+    constexpr std::array<std::string, static_cast<size_t>(LogType::COUNT)> names = {
+        "INFO",
+        "WARNING",
+        "CRITICAL"
+    };
+
+    auto index = static_cast<size_t>(type);
+
+    if (index >= names.size())
+        return "UNKNOWN";
+    
+    return names[index];
+}
+
 LogTimer::LogTimer(std::string_view name, std::source_location loc) {
 
     m_name = name;
     m_location = loc;
     m_startTimePoint = std::chrono::steady_clock::now();
 
-    std::cout << std::format("VEIL::INFO Process '{}' started at '{}'", 
-                             m_name, m_location.function_name()) << std::endl;
+    std::cout << Log::message(LogType::INFO, "Process '{}' started at '{}'", 
+                              m_name, m_location.function_name()) << std::endl;
 }
 
 LogTimer::~LogTimer() {
@@ -18,13 +35,13 @@ LogTimer::~LogTimer() {
     const std::chrono::steady_clock::time_point endTimePoint = std::chrono::steady_clock::now();
     const auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTimePoint - m_startTimePoint);
 
-    std::cout << std::format("VEIL::INFO Process '{}' finished in {}", m_name, elapsedTime) << std::endl;
+    std::cout << Log::message(LogType::INFO, "Process '{}' finished in {}", m_name, elapsedTime) << std::endl;
 }
 
 Exception::Exception(std::string_view msg, std::source_location loc) 
     : std::runtime_error(msg.data()), m_location(loc) {
     
-    m_error_message = std::format("VEIL::ERROR {} in {}", msg, m_location.function_name());
+    m_error_message = Log::message(LogType::CRITICAL, "{} in {}", msg, m_location.function_name());
 }
 
 const char* Exception::what() const noexcept {

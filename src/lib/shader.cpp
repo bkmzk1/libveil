@@ -8,7 +8,7 @@ static std::string readFile(const std::string& filename) {
     std::ifstream file(filename, std::ios::in | std::ios::binary);
 
     if (!file.is_open())
-        throw veil::Exception(std::format("Failed to read {}", filename));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to read {}", filename));
     
     return std::string{
         std::istreambuf_iterator<char>(file),
@@ -21,7 +21,7 @@ Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> source
     LogTimer("shader");
 
     if (sources.size() == 0)
-        throw veil::Exception("Failed to create an empty shader");
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to create an empty shader"));
 
     m_shaderProgram = glCreateProgram();
 
@@ -54,7 +54,7 @@ Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> source
                 GLchar infoLog[512];
                 glGetShaderInfoLog(shader, 512, nullptr, infoLog);
                 throw veil::Exception(
-                    std::format("Failed to compile shader: {}", infoLog)
+                    Log::message(LogType::CRITICAL, "Failed to compile shader: {}", infoLog)
                 );
             }
 
@@ -68,7 +68,7 @@ Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> source
             GLchar infoLog[512];
             glGetProgramInfoLog(m_shaderProgram, 512, nullptr, infoLog);
             throw veil::Exception(
-                std::format("Failed to link shader program: {}", infoLog)
+                Log::message(LogType::CRITICAL, "Failed to link shader program: {}", infoLog)
             );
         }
     }

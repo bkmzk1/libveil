@@ -13,5 +13,4 @@
 #include "veil/math.hpp"
 
 //TODO: Make shader optimizations 
-//TODO: Add warnings and noncritical errors
 //TODO: Window events

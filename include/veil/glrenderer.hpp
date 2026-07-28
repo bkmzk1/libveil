@@ -44,7 +44,9 @@ class VEIL_EXPORT GLRenderer {
             GLint location = glGetUniformLocation(shader.getID(), uniformName.data());
 
             if (location == -1)
-                throw veil::Exception(std::format("No uniform '{}' found in program {}", uniformName, shader.getID()));
+                throw veil::Exception(
+                    Log::message(LogType::CRITICAL, "No uniform '{}' found in program {}", uniformName, shader.getID())
+                );
 
             if constexpr (std::is_invocable_v<std::decay_t<T>>)
                 m_uniformData[&shader].push_back({
@@ -64,8 +66,11 @@ class VEIL_EXPORT GLRenderer {
         template<typename T>
         void uploadUniformUniversal(std::string_view uniformName, T&& v) {
 
-            for (const auto& data : m_renderData) 
+            for (const auto& data : m_renderData) {
+                
+                data.first->useProgram();
                 uploadUniform(*data.first, uniformName, std::move(v));
+            }
         }
         template<typename T>
         void setUniformDirect(const Shader& shader, std::string_view uniformName, const T& v) {
@@ -73,7 +78,9 @@ class VEIL_EXPORT GLRenderer {
             GLint location = glGetUniformLocation(shader.getID(), uniformName.data());
 
             if (location == -1)
-                throw veil::Exception(std::format("No uniform '{}' found in program {}", uniformName, shader.getID()));
+                throw veil::Exception(
+                    Log::message(LogType::CRITICAL, "No uniform '{}' found in program {}", uniformName, shader.getID())
+                );
             
             shader.setUniform(location, v);
         }

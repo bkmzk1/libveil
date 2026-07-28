@@ -11,8 +11,8 @@
 
 namespace veil {
 
-constexpr std::string g_cacheFile = "/cache.bin";
-constexpr std::string g_cacheDir  = "/.cache";
+constexpr const char g_cacheFile[11] = "/cache.bin";
+constexpr const char g_cacheDir[8]  = "/.cache";
 
 class Model;
 class ModelInstance;
