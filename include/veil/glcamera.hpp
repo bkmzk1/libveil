@@ -19,6 +19,7 @@ class VEIL_EXPORT GLCamera {
 
         Vector3 m_position;
         Vector3 m_up;
+        Vector3 m_front;
 
         void calculateAttitude(double xpos, double ypos);
         void updateView();

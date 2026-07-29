@@ -9,7 +9,7 @@
 namespace veil {
 
 template<int N>
-struct VEIL_EXPORT Vector : glm::vec<N, float> {
+struct Vector : glm::vec<N, float> {
 
     using Base = glm::vec<N, float>;
 
@@ -20,13 +20,16 @@ struct VEIL_EXPORT Vector : glm::vec<N, float> {
     Vector normalized() const { 
         return Vector(glm::normalize(static_cast<Base>(*this))); 
     }
+    static Vector cross(const Vector& a, const Vector& b) {
+        return Vector(glm::cross(static_cast<Base>(a), static_cast<Base>(b)));
+    }
 };
 using Vector2 = Vector<2>;
 using Vector3 = Vector<3>;
 using Vector4 = Vector<4>;
 
 template<int C, int R>
-struct VEIL_EXPORT Matrix : glm::mat<C, R, float, glm::packed_highp> {
+struct Matrix : glm::mat<C, R, float, glm::packed_highp> {
 
     using Base = glm::mat<C, R, float, glm::packed_highp>;
 

@@ -15,6 +15,8 @@ namespace veil {
 
 struct GLCamera;
 
+using KeyDownArray = std::array<bool, GLFW_KEY_LAST + 1>;
+
 inline void initOpenGLDriver() {
     
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -38,6 +40,7 @@ class VEIL_EXPORT Window {
         void setUpdateCallback(std::function<void()>&& loopFunc);
         void setMouseCallback(std::function<void(double, double)>&& mouseFunc);
         void setFramebufferCallback(std::function<void()>&& framebufferFunc);
+        void setKeyCallback(std::function<void(const KeyDownArray&)>&& keyFunc);
 
         void startUpdateLoop();
 
@@ -51,9 +54,13 @@ class VEIL_EXPORT Window {
         std::function<void()> m_loopFunc;
         std::function<void(double, double)> m_mouseFunc;
         std::function<void()> m_framebufferFunc;
+        std::function<void(const KeyDownArray&)> m_keyFunc;
+
+        KeyDownArray m_keysDown{};
 
         static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
         static void framebufferCallback(GLFWwindow* window, int width, int height);
+        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 }; //class Window
 

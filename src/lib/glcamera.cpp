@@ -46,9 +46,9 @@ void GLCamera::updateView() {
     float z = std::sin(glm::radians(m_yaw)) * std::cos(glm::radians(m_pitch));
 
     Vector3 forward(x, y, z);
-    forward.normalized();
+    m_front = forward.normalized();
 
-    m_view.makeView(m_position, m_position + forward, m_up);
+    m_view.makeView(m_position, m_position + m_front, m_up);
 }
 
 void GLCamera::updateProjection(float fovyDeg, float aspectRatio) {
