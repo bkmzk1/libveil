@@ -100,13 +100,13 @@ ModelInstance ModelStorage::loadModel(const std::string& path) {
     
     auto it = m_cache.find(path);
     if (it != m_cache.end())
-        return ModelInstance(this->getExisting(path));
+        return ModelInstance(this->getWrapped(path));
     
     m_cache.try_emplace(path, Model(path));
-    return ModelInstance(this->getExisting(path));
+    return ModelInstance(this->getWrapped(path));
 } 
 
-ModelInstance ModelStorage::getExisting(const std::string& path) const {
+ModelInstance ModelStorage::getWrapped(const std::string& path) const {
 
     auto it = m_cache.find(path);
 
@@ -116,7 +116,7 @@ ModelInstance ModelStorage::getExisting(const std::string& path) const {
     return ModelInstance(it->second);
 }
 
-const Model& ModelStorage::getReference(const std::string& path) const {
+const Model& ModelStorage::getRaw(const std::string& path) const {
 
     auto it = m_cache.find(path);
 

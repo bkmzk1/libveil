@@ -48,8 +48,9 @@ class VEIL_EXPORT ModelStorage {
         ~ModelStorage() = default;
 
         static ModelStorage& getInstance();
-        ModelInstance getExisting(const std::string& path) const;
-        const Model& getReference(const std::string& path) const;
+        
+        ModelInstance getWrapped(const std::string& path) const;
+        const Model& getRaw(const std::string& path) const;
 
         ModelInstance loadModel(const std::string& path);
         static void shutdown();

@@ -18,9 +18,7 @@ struct GLCamera;
 inline void initOpenGLDriver() {
     
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-        throw veil::Exception(
-            Log::message(LogType::CRITICAL, "Failed to initialize GLAD")
-        ); 
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to initialize GLAD")); 
 }
 
 class VEIL_EXPORT Window {

@@ -135,28 +135,12 @@ void ModelInstance::scale(const Vector3& scaleRatio) {
     m_modelMatrix.scale(scaleRatio);
 }
 
-InstancedModels::InstancedModels(const Model& base, size_t maxInstances, GLuint modelUniformLocation) : m_base(base) {
+InstancedModels::InstancedModels(const Model& base, size_t maxInstances) : m_base(base) {
 
     m_maxInstances = maxInstances;
 
     glCreateBuffers(1, &m_instancesVBO);
     glNamedBufferData(m_instancesVBO, maxInstances * sizeof(Matrix4), nullptr, GL_STATIC_DRAW);
-
-    for (const auto& mesh : base.getMeshesRead()) {
-
-        GLuint vao = mesh.getVAO();
-
-        glVertexArrayVertexBuffer(vao, 1, m_instancesVBO, 0, sizeof(Matrix4));
-        glVertexArrayBindingDivisor(vao, 1, 1);
-
-        for (int i = 0; i < 4; ++i) {
-
-            GLuint loc = modelUniformLocation + i;
-            glEnableVertexArrayAttrib(vao, loc);
-            glVertexArrayAttribBinding(vao, loc, 1);
-            glVertexArrayAttribFormat(vao, loc, 4, GL_FLOAT, GL_FALSE, i * sizeof(Vector4));
-        }
-    }
 }
 
 InstancedModels::InstancedModels(InstancedModels&& other) noexcept : m_base(std::move(other.m_base)) {
@@ -196,6 +180,30 @@ void InstancedModels::setInstances(std::span<const Matrix4> instances) {
 
     m_instancesCount = instances.size();
     glNamedBufferSubData(m_instancesVBO, 0, m_instancesCount * sizeof(Matrix4), &instances[0]);
+}
+
+void InstancedModels::setInstanceAttribute(const Shader& shader, std::string_view name) {
+
+    GLint modelAttribLocation = glGetAttribLocation(shader.getID(), name.data());
+
+    if (modelAttribLocation < 0)
+        throw veil::Exception(Log::message(LogType::CRITICAL, "No uniform attribute found '{}'", name));
+
+    for (const auto& mesh : m_base.getMeshesRead()) {
+
+        GLuint vao = mesh.getVAO();
+
+        glVertexArrayVertexBuffer(vao, 1, m_instancesVBO, 0, sizeof(Matrix4));
+        glVertexArrayBindingDivisor(vao, 1, 1);
+
+        for (int i = 0; i < 4; ++i) {
+
+            GLuint loc = modelAttribLocation + i;
+            glEnableVertexArrayAttrib(vao, loc);
+            glVertexArrayAttribBinding(vao, loc, 1);
+            glVertexArrayAttribFormat(vao, loc, 4, GL_FLOAT, GL_FALSE, i * sizeof(Vector4));
+        }
+    }
 }
 
 void InstancedModels::render(const Shader& shader) const {

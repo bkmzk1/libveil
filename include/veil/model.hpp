@@ -78,7 +78,7 @@ class VEIL_EXPORT ModelInstance : public util::IDrawable {
 
 class VEIL_EXPORT InstancedModels : public util::IDrawable {
     public:
-        InstancedModels(const Model& base, size_t maxInstances, GLuint modelUniformLocation);
+        InstancedModels(const Model& base, size_t maxInstances);
 
         InstancedModels(const InstancedModels&) = delete;
         InstancedModels& operator=(const InstancedModels&) = delete;
@@ -89,6 +89,7 @@ class VEIL_EXPORT InstancedModels : public util::IDrawable {
         virtual ~InstancedModels();
 
         void setInstances(std::span<const Matrix4> instances);
+        void setInstanceAttribute(const Shader& shader, std::string_view attribName);
 
         void render(const Shader& shader) const override;
 
