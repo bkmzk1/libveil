@@ -3,7 +3,14 @@
 
 namespace veil {
 
-Window::Window(std::string_view title, int width, int height) {
+void Clock::tick() {
+
+    double currentTime = glfwGetTime();
+    m_deltaTime = currentTime - m_lastTime;
+    m_lastTime = currentTime;
+}
+
+Window::Window(std::string_view title, const Vector2& windowSize) {
 
     m_loopFunc = nullptr;
 
@@ -14,7 +21,7 @@ Window::Window(std::string_view title, int width, int height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    m_window = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
+    m_window = glfwCreateWindow(windowSize.x, windowSize.y, title.data(), nullptr, nullptr);
     if (!m_window) {
         glfwTerminate();
         throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to create GLFW window"));
@@ -24,12 +31,12 @@ Window::Window(std::string_view title, int width, int height) {
     glfwSetWindowUserPointer(m_window, this);
 
     #ifdef _WIN32
-    veil::initOpenGLDriver(); // WIN32 glad needs this macro to run explicitely in the .dll code
-                              // or else glad function pointers will be 0x0
-                              // THE CODE HAS NOT BEEN TESTED ON LINUX YET
+    veil::initOpenGLDriver(this); // WIN32 glad needs this macro to run explicitely in the .dll code
+                                  // or else glad function pointers will be 0x0
+                                  // THE CODE HAS NOT BEEN TESTED ON LINUX YET
     #endif 
 
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, windowSize.x, windowSize.y);
 }
 
 Window::~Window() {
@@ -61,25 +68,33 @@ void Window::setKeyCallback(std::function<void(const KeyDownArray&)>&& keyFunc) 
     glfwSetKeyCallback(m_window, &Window::keyCallback);
 }
 
-void Window::startUpdateLoop() {
+int Window::startUpdateLoop() {
 
     if (!m_loopFunc)
-        return;
+        return EXIT_FAILURE;
     
     glfwSwapInterval(1);
 
     while (!this->shouldClose()) {
 
-        this->pollEvents();
+        m_clock.tick();
 
-        if (m_keyFunc)
-            m_keyFunc(m_keysDown);
+        try {
+            if (m_keyFunc)
+                m_keyFunc(m_keysDown);
 
-        m_loopFunc();
+            m_loopFunc();
+        }
+        catch (const std::exception& e) {
+
+            std::cerr << e.what() << std::endl;
+            return EXIT_FAILURE;
+        }
 
         this->swapBuffers();
-
+        this->pollEvents();
     }
+    return EXIT_SUCCESS;
 }
 
 float Window::getAspectRatio() const {

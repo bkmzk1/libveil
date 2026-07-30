@@ -24,12 +24,11 @@ class VEIL_EXPORT TextureStorage {
         TextureStorage& operator=(const TextureStorage&) = delete;
         TextureStorage(TextureStorage&&) = delete;
         TextureStorage& operator=(TextureStorage&&) = delete;
-        ~TextureStorage() = default; 
-
-        Texture loadTexture(const std::string& path);
-        static void shutdown();
+        ~TextureStorage(); 
 
         static TextureStorage& getInstance();
+
+        Texture loadTexture(const std::string& path);
 
     private:
         std::unordered_map<std::string, Texture> m_cache;
@@ -48,12 +47,11 @@ class VEIL_EXPORT ModelStorage {
         ~ModelStorage() = default;
 
         static ModelStorage& getInstance();
-        
-        ModelInstance getWrapped(const std::string& path) const;
-        const Model& getRaw(const std::string& path) const;
+    
+        const Model& getModel(const std::string& path) const;
 
+        ModelInstance instantiate(const std::string& path) const;
         ModelInstance loadModel(const std::string& path);
-        static void shutdown();
 
         void saveToBIN(const Model& model) const;
         void loadFromBIN(Model& model);

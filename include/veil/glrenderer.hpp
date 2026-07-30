@@ -73,7 +73,7 @@ class VEIL_EXPORT GLRenderer {
             }
         }
         template<typename T>
-        void setUniformDirect(const Shader& shader, std::string_view uniformName, const T& v) {
+        void uploadUniformDirect(const Shader& shader, std::string_view uniformName, const T& v) {
             
             GLint location = glGetUniformLocation(shader.getID(), uniformName.data());
 

@@ -27,7 +27,7 @@ Texture TextureStorage::loadTexture(const std::string& path) {
     return texture;
 } 
 
-void TextureStorage::shutdown() {
+TextureStorage::~TextureStorage() {
 
     auto& instance = getInstance();
     for (const auto& [path, texture] : instance.m_cache) {
@@ -36,7 +36,7 @@ void TextureStorage::shutdown() {
         }
     }
     instance.m_cache.clear();
-} 
+}
 
 TextureStorage& TextureStorage::getInstance() {
 
@@ -100,23 +100,13 @@ ModelInstance ModelStorage::loadModel(const std::string& path) {
     
     auto it = m_cache.find(path);
     if (it != m_cache.end())
-        return ModelInstance(this->getWrapped(path));
+        return ModelInstance(this->instantiate(path));
     
     m_cache.try_emplace(path, Model(path));
-    return ModelInstance(this->getWrapped(path));
+    return ModelInstance(this->instantiate(path));
 } 
 
-ModelInstance ModelStorage::getWrapped(const std::string& path) const {
-
-    auto it = m_cache.find(path);
-
-    if (it == m_cache.end())
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load model at {}", path));
-
-    return ModelInstance(it->second);
-}
-
-const Model& ModelStorage::getRaw(const std::string& path) const {
+const Model& ModelStorage::getModel(const std::string& path) const {
 
     auto it = m_cache.find(path);
 
@@ -126,10 +116,14 @@ const Model& ModelStorage::getRaw(const std::string& path) const {
     return it->second;
 }
 
-void ModelStorage::shutdown() {
+ModelInstance ModelStorage::instantiate(const std::string& path) const {
 
-    auto& instance = getInstance();
-    instance.m_cache.clear();
+    auto it = m_cache.find(path);
+
+    if (it == m_cache.end())
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load model at {}", path));
+
+    return ModelInstance(it->second);
 }
 
 void ModelStorage::saveToBIN(const Model& model) const {

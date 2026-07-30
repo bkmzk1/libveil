@@ -3,7 +3,7 @@
 
 namespace veil {
 
-GLCamera::GLCamera(const Vector2& size, const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg) {
+GLCamera::GLCamera(const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg) {
 
     m_position = initPos;
     m_up = up;
@@ -11,19 +11,26 @@ GLCamera::GLCamera(const Vector2& size, const Vector3& initPos, const Vector3& u
     m_projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
     m_view = Matrix4(1.0f);
 
-    m_lastx = size.x / 2.0f;
-    m_lasty = size.y / 2.0f;
+    m_lastx = 0.0f;
+    m_lasty = 0.0f;
 
-    updateView();
+    m_viewDirty = true;
+}
+
+const Matrix4& GLCamera::getView() {
+    
+    if (m_viewDirty) 
+        updateView();  
+    return m_view;
 }
 
 void GLCamera::calculateAttitude(double xpos, double ypos) {
 
-    if (firstMovement) {
+    if (m_firstMovement) {
 
         m_lastx = xpos;
         m_lasty = ypos;
-        firstMovement = false;
+        m_firstMovement = false;
     }
 
     double xoff = (xpos - m_lastx) * 0.1f;
@@ -36,7 +43,7 @@ void GLCamera::calculateAttitude(double xpos, double ypos) {
     m_lastx = xpos;
     m_lasty = ypos;
 
-    updateView();
+    m_viewDirty = true;
 }
 
 void GLCamera::updateView() {
@@ -44,16 +51,28 @@ void GLCamera::updateView() {
     float x = std::cos(glm::radians(m_yaw)) * std::cos(glm::radians(m_pitch));
     float y = std::sin(glm::radians(m_pitch));
     float z = std::sin(glm::radians(m_yaw)) * std::cos(glm::radians(m_pitch));
-
     Vector3 forward(x, y, z);
+
     m_front = forward.normalized();
 
     m_view.makeView(m_position, m_position + m_front, m_up);
+
+    m_viewDirty = false;
 }
 
 void GLCamera::updateProjection(float fovyDeg, float aspectRatio) {
 
     m_projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
+}
+
+void GLCamera::resyncMouse() {
+    m_firstMovement = true;
+}
+
+void GLCamera::move(const Vector3& factor) {
+
+    m_position += factor;
+    m_viewDirty = true;
 }
 
 }; //namespace veil

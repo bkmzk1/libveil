@@ -13,4 +13,3 @@
 #include "veil/math.hpp"
 
 //TODO: Make shader optimizations 
-//TODO: Window events
