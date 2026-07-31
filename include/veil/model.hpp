@@ -23,10 +23,9 @@ namespace veil {
 class VEIL_EXPORT Model {
     public:
         explicit Model(std::string_view path);
-        
+
         Model(const Model&) = delete;
         Model& operator=(const Model&) = delete;
-
         Model(Model&&) noexcept = default;
         Model& operator=(Model&&) noexcept = default;
 
@@ -51,10 +50,9 @@ class VEIL_EXPORT ModelInstance : public util::IDrawable {
     public:
         ModelInstance() = delete;
         ModelInstance(const Model& base);
-        
+
         ModelInstance(const ModelInstance&) = delete;
         ModelInstance& operator=(const ModelInstance&) = delete;
-
         ModelInstance(ModelInstance&&) noexcept = default;
         ModelInstance& operator=(ModelInstance&&) noexcept = default;
 
@@ -69,7 +67,7 @@ class VEIL_EXPORT ModelInstance : public util::IDrawable {
         inline const Model& getBase() const { return m_base; }
         inline const Matrix4& getModelMat() const { return m_modelMatrix; }
 
-        inline util::DrawableType getType() const override { return util::DrawableType::MODEL_SINGULAR; }
+        inline constexpr util::DrawableType getType() const override { return util::DrawableType::MODEL_SINGULAR; }
 
     private:
         const Model& m_base;

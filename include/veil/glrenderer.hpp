@@ -17,7 +17,7 @@
 
 namespace veil {
 
-inline void initRenderingFlags() {
+constexpr inline void initRenderingFlags() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE); 
@@ -26,18 +26,12 @@ inline void initRenderingFlags() {
 class VEIL_EXPORT GLRenderer {
     public:
         GLRenderer() = default;
-
-        GLRenderer(const GLRenderer&) = delete;
-        GLRenderer& operator=(const GLRenderer&) = delete;
-        GLRenderer(GLRenderer&&) noexcept = default;
-        GLRenderer& operator=(GLRenderer&&) noexcept = default;
-
         ~GLRenderer() = default;
 
         void setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc);
 
         void addTargets(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets);
-
+        
         template<typename T> 
         void uploadUniform(const Shader& shader, std::string_view uniformName, T&& v) {
             

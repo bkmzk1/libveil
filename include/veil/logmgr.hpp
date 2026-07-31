@@ -11,6 +11,8 @@
 #include <array>
 #include <string_view>
 
+#include "assets.hpp"
+
 namespace veil {
 
 enum class LogType : uint8_t {
@@ -20,15 +22,12 @@ enum class LogType : uint8_t {
     COUNT
 };
 
-struct VEIL_EXPORT Log {
-    public:
-        Log() = delete;
-        Log(const Log&) = delete;
-        Log& operator=(const Log&) = delete;
-        Log(Log&&) = delete;
-        Log& operator=(Log&&) = delete;
-        ~Log() = default;
+struct VEIL_EXPORT Log : util::Singleton<Log> {
 
+    friend class util::Singleton<Log>;
+
+    public:
+        ~Log() = default;
         template<typename... Args>
         static std::string message(LogType type, std::format_string<Args...> fmt, Args&&... args) {
 
@@ -39,6 +38,7 @@ struct VEIL_EXPORT Log {
         }
 
     private:
+        Log() = default;
         constexpr static std::string typeToString(LogType type) {
 
             constexpr std::array<std::string, static_cast<size_t>(LogType::COUNT)> names = {
@@ -51,6 +51,7 @@ struct VEIL_EXPORT Log {
                 return "UNKNOWN";
             return names[index];
         }
+        
 }; //class Log
 
 class VEIL_EXPORT LogTimer {

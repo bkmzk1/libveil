@@ -44,7 +44,8 @@ namespace util {
 
     enum class DrawableType : uint8_t {
         MODEL_SINGULAR,
-        MODEL_INSTANCED
+        MODEL_INSTANCED,
+        UNKNOWN
     };
 
     class VEIL_EXPORT IDrawable {
@@ -52,8 +53,25 @@ namespace util {
             virtual ~IDrawable() = default;
             
             virtual void render(const Shader&) const = 0;
-            virtual DrawableType getType() const = 0;
+            virtual constexpr DrawableType getType() const { return DrawableType::UNKNOWN; }
     }; //class IDrawable
+
+    template<typename T>
+    class Singleton {
+        public:
+            Singleton(const Singleton&) = delete;
+            Singleton& operator=(const Singleton&) = delete;
+            Singleton(Singleton&&) = delete;
+            Singleton& operator=(Singleton&&) = delete;
+        
+            static T& getInstance() {
+                static T instance;
+                return instance;
+            }
+        protected:
+            Singleton() = default;
+            ~Singleton() = default;
+    }; //class Singleton
 
 
 }; //namespace util

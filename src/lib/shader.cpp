@@ -31,10 +31,12 @@ Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> source
     try {
         std::vector<std::string> sourceFiles;
         sourceFiles.reserve(sources.size());
+
         std::vector<GLenum> sourceTypes;
         sourceTypes.reserve(sources.size());
 
         for (const auto& source : sources) {
+
             sourceFiles.push_back(readFile(static_cast<std::string>(source.first)));
             sourceTypes.push_back(source.second);
         }
@@ -45,31 +47,31 @@ Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> source
             shaderIDs.push_back(shader);
 
             const char* srcPtr = sourceFiles[i].c_str();
-            glShaderSource(shader, 1, &srcPtr, nullptr);
 
+            glShaderSource(shader, 1, &srcPtr, nullptr);
             glCompileShader(shader);
+
             GLint success;
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
+
                 GLchar infoLog[512];
                 glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-                throw veil::Exception(
-                    Log::message(LogType::CRITICAL, "Failed to compile shader: {}", infoLog)
-                );
+                throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to compile shader: {}", infoLog));
             }
 
             glAttachShader(m_shaderProgram, shader);
         }
 
         glLinkProgram(m_shaderProgram);
+
         GLint success;
         glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
         if (!success) {
+            
             GLchar infoLog[512];
             glGetProgramInfoLog(m_shaderProgram, 512, nullptr, infoLog);
-            throw veil::Exception(
-                Log::message(LogType::CRITICAL, "Failed to link shader program: {}", infoLog)
-            );
+            throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to link shader program: {}", infoLog));
         }
     }
     catch(...) {

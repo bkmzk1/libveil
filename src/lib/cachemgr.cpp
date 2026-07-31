@@ -38,12 +38,6 @@ TextureStorage::~TextureStorage() {
     instance.m_cache.clear();
 }
 
-TextureStorage& TextureStorage::getInstance() {
-
-    static TextureStorage ts;
-    return ts;
-} 
-
 GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
 
     stbi_set_flip_vertically_on_load(false);
@@ -89,12 +83,6 @@ GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
 
     return textureID;
 }
-
-ModelStorage& ModelStorage::getInstance() {
-
-    static ModelStorage ms;
-    return ms;
-} 
 
 ModelInstance ModelStorage::loadModel(const std::string& path) {
     
