@@ -11,7 +11,7 @@
 
 namespace veil {
 
-class VEIL_EXPORT Mesh : public IDrawable {
+class VEIL_EXPORT Mesh {
     public:
         Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, Material& material);
         Mesh(const Mesh&) = delete;
@@ -20,14 +20,13 @@ class VEIL_EXPORT Mesh : public IDrawable {
         Mesh& operator=(Mesh&& other) noexcept;
         ~Mesh();
         
-        void render() const override;
+        void render() const;
 
         inline const std::span<const Vertex> getVertices() const { return m_vertices; }
         inline const std::span<const unsigned int> getIndices() const { return m_indices; }
         inline const Material& getMaterial() const { return m_material; }
         inline const GLuint getVAO() const { return m_vao; }
-
-        inline DrawableType getType() const override { return DrawableType::MESH; }
+        
     private:
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;

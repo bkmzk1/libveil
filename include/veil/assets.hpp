@@ -13,7 +13,6 @@ namespace veil {
 class Shader;
 
 enum class DrawableType : uint8_t {
-    MESH,
     MODEL_SINGULAR,
     MODEL_INSTANCED,
     UNKNOWN
