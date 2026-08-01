@@ -24,7 +24,7 @@ LogTimer::~LogTimer() {
 Exception::Exception(std::string_view msg, std::source_location loc) 
     : std::runtime_error(msg.data()), m_location(loc) {
     
-    m_error_message = Log::message(LogType::CRITICAL, "{} in {}", msg, m_location.function_name());
+    m_error_message = std::format("{} in {}", msg, m_location.function_name());
 }
 
 const char* Exception::what() const noexcept {

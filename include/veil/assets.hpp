@@ -46,14 +46,20 @@ namespace util {
         MODEL_SINGULAR,
         MODEL_INSTANCED,
         UNKNOWN
-    };
+    }; //enum class DrawableType
 
     class VEIL_EXPORT IDrawable {
         public:
             virtual ~IDrawable() = default;
-            
-            virtual void render(const Shader&) const = 0;
-            virtual constexpr DrawableType getType() const { return DrawableType::UNKNOWN; }
+
+            void setCurrentShader(const Shader* shader) const { m_currentShader = shader; }
+
+            virtual void render() const = 0;
+
+            virtual DrawableType getType() const = 0;
+            const Shader* getCurrentShader() const { return m_currentShader; }
+        protected:    
+            mutable const Shader* m_currentShader = 0;
     }; //class IDrawable
 
     template<typename T>

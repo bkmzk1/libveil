@@ -120,9 +120,9 @@ ModelInstance::ModelInstance(const Model& base) : m_base(base) {
     m_modelMatrix = Matrix4(1.0f);
 }
 
-void ModelInstance::render(const Shader& shader) const {
+void ModelInstance::render() const {
 
-    m_base.render(shader);
+    m_base.render(*m_currentShader);
 }
 
 void ModelInstance::translate(const Vector3& translationVec) {
@@ -206,7 +206,7 @@ void InstancedModels::setInstanceAttribute(const Shader& shader, std::string_vie
     }
 }
 
-void InstancedModels::render(const Shader& shader) const {
+void InstancedModels::render() const {
 
     for (const auto& mesh : m_base.getMeshesRead()) {
 

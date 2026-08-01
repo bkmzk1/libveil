@@ -58,7 +58,7 @@ class VEIL_EXPORT ModelInstance : public util::IDrawable {
 
         virtual ~ModelInstance() = default;
 
-        void render(const Shader& shader) const override;
+        void render() const override;
 
         void translate(const Vector3& translationVec);
         void rotate(float deg, const Vector3& rotateDir);
@@ -67,7 +67,7 @@ class VEIL_EXPORT ModelInstance : public util::IDrawable {
         inline const Model& getBase() const { return m_base; }
         inline const Matrix4& getModelMat() const { return m_modelMatrix; }
 
-        inline constexpr util::DrawableType getType() const override { return util::DrawableType::MODEL_SINGULAR; }
+        inline util::DrawableType getType() const override { return util::DrawableType::MODEL_SINGULAR; }
 
     private:
         const Model& m_base;
@@ -89,7 +89,7 @@ class VEIL_EXPORT InstancedModels : public util::IDrawable {
         void setInstances(std::span<const Matrix4> instances);
         void setInstanceAttribute(const Shader& shader, std::string_view attribName);
 
-        void render(const Shader& shader) const override;
+        void render() const override;
 
         inline util::DrawableType getType() const override { return util::DrawableType::MODEL_INSTANCED; }
 

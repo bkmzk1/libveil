@@ -12,4 +12,5 @@
 #include "veil/glrenderer.hpp"
 #include "veil/math.hpp"
 
-//TODO: Make shader optimizations 
+//TODO: Make more idrawables
+//FIXME: The destructor of TextureStorage
