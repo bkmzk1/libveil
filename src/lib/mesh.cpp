@@ -76,7 +76,7 @@ Mesh::~Mesh() {
     if (m_ebo) glDeleteBuffers(1, &m_ebo);
 }
 
-void Mesh::render(const Shader& shader) const {
+void Mesh::render() const {
 
     glBindTextureUnit(0, m_material.diffuse.id);
     glBindTextureUnit(1, m_material.specular.id);

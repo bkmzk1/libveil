@@ -9,22 +9,22 @@ void GLRenderer::reserveShaders(const std::vector<const Shader*>& shaders) {
         m_renderData.try_emplace(shader, 0);
 }
 
-void GLRenderer::addTargets(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets) {
+void GLRenderer::addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
         const Shader* shader = &target.first;
-        const util::IDrawable* drawable = &target.second;
+        const IDrawable* drawable = &target.second;
 
         m_renderData[shader].push_back(drawable);
         drawable->setCurrentShader(shader);
     }
 }
-void GLRenderer::changeTargetShader(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets) {
+void GLRenderer::changeTargetShader(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
-        const util::IDrawable* drawable = &target.second;
+        const IDrawable* drawable = &target.second;
         const Shader* newShader = &target.first;
         const Shader* oldShader = drawable->getCurrentShader();
 
@@ -76,7 +76,7 @@ void GLRenderer::callbackRender() const {
 
         for (const auto& model : models) {
 
-            if (m_forModelFunc && model->getType() == util::DrawableType::MODEL_SINGULAR)
+            if (m_forModelFunc && model->getType() == DrawableType::MODEL_SINGULAR)
                 m_forModelFunc(shader, static_cast<const ModelInstance*>(model));
             
             model->render();

@@ -17,10 +17,10 @@ Model::Model(std::string_view path) {
         loadModel(path);
 }
 
-void Model::render(const Shader& shader) const {
+void Model::render() const {
 
     for (const auto& mesh : m_meshes) 
-        mesh.render(shader);
+        mesh.render();
 }
 
 void Model::loadModel(std::string_view path) {
@@ -122,7 +122,7 @@ ModelInstance::ModelInstance(const Model& base) : m_base(base) {
 
 void ModelInstance::render() const {
 
-    m_base.render(*m_currentShader);
+    m_base.render();
 }
 
 void ModelInstance::translate(const Vector3& translationVec) {

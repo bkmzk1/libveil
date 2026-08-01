@@ -31,7 +31,7 @@ class VEIL_EXPORT Model {
 
         ~Model() = default;
         
-        void render(const Shader& shader) const; 
+        void render() const; 
 
         inline std::string_view getDirectory() const { return m_directory; }
         inline std::span<const Mesh> getMeshesRead() const { return m_meshes; }
@@ -46,7 +46,7 @@ class VEIL_EXPORT Model {
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 }; //class Model
 
-class VEIL_EXPORT ModelInstance : public util::IDrawable {
+class VEIL_EXPORT ModelInstance : public IDrawable {
     public:
         ModelInstance() = delete;
         ModelInstance(const Model& base);
@@ -67,14 +67,14 @@ class VEIL_EXPORT ModelInstance : public util::IDrawable {
         inline const Model& getBase() const { return m_base; }
         inline const Matrix4& getModelMat() const { return m_modelMatrix; }
 
-        inline util::DrawableType getType() const override { return util::DrawableType::MODEL_SINGULAR; }
+        inline DrawableType getType() const override { return DrawableType::MODEL_SINGULAR; }
 
     private:
         const Model& m_base;
         Matrix4 m_modelMatrix;
 }; //class ModelInstance
 
-class VEIL_EXPORT InstancedModels : public util::IDrawable {
+class VEIL_EXPORT InstancedModels : public IDrawable {
     public:
         InstancedModels(const Model& base, size_t maxInstances);
 
@@ -91,7 +91,7 @@ class VEIL_EXPORT InstancedModels : public util::IDrawable {
 
         void render() const override;
 
-        inline util::DrawableType getType() const override { return util::DrawableType::MODEL_INSTANCED; }
+        inline DrawableType getType() const override { return DrawableType::MODEL_INSTANCED; }
 
     private:
         const Model& m_base; 

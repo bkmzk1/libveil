@@ -31,8 +31,8 @@ class VEIL_EXPORT GLRenderer {
         void setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc);
 
         void reserveShaders(const std::vector<const Shader*>& shaders);
-        void addTargets(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets);
-        void changeTargetShader(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets);
+        void addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets);
+        void changeTargetShader(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets);
         
         template<typename T> 
         void uploadUniform(const Shader& shader, std::string_view uniformName, T&& v) {
@@ -89,7 +89,7 @@ class VEIL_EXPORT GLRenderer {
     private:
         std::unordered_map<
             const Shader*, 
-            std::vector<const util::IDrawable*> 
+            std::vector<const IDrawable*> 
 
         > m_renderData;
 
