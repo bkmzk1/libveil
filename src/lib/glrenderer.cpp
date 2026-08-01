@@ -3,20 +3,30 @@
 
 namespace veil {
 
+void GLRenderer::reserveShaders(const std::vector<const Shader*>& shaders) {
+
+    for (const auto& shader : shaders) 
+        m_renderData.try_emplace(shader, 0);
+}
+
 void GLRenderer::addTargets(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets) {
 
     for (const auto& target : targets) {
-        m_renderData[&target.first].push_back(&target.second);
-        target.second.setCurrentShader(&target.first);
+
+        const Shader* shader = &target.first;
+        const util::IDrawable* drawable = &target.second;
+
+        m_renderData[shader].push_back(drawable);
+        drawable->setCurrentShader(shader);
     }
 }
-void GLRenderer::changeShaderFor(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets) {
+void GLRenderer::changeTargetShader(std::initializer_list<std::pair<const Shader&, const util::IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
-        const Shader* newShader = &target.first;
-        const Shader* oldShader = target.second.getCurrentShader();
         const util::IDrawable* drawable = &target.second;
+        const Shader* newShader = &target.first;
+        const Shader* oldShader = drawable->getCurrentShader();
 
         if (newShader && newShader != oldShader) {
             
