@@ -14,4 +14,3 @@
 
 //TODO: Make more idrawables
 //FIXME: The destructor of TextureStorage
-//TODO: KeyPress events

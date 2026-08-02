@@ -17,7 +17,13 @@ namespace veil {
 
 struct GLCamera;
 
-using KeyDownArray = std::array<bool, GLFW_KEY_LAST + 1>;
+using KeyArray = std::array<bool, GLFW_KEY_LAST + 1>;
+
+struct VEIL_EXPORT KeyEvents {
+    KeyArray keysDown;
+    KeyArray keysPressed;
+
+}; //struct KeyEvents
 
 class VEIL_EXPORT Clock {
     public:
@@ -27,7 +33,8 @@ class VEIL_EXPORT Clock {
     private:
         double m_lastTime = 0.0;
         float m_deltaTime = 0.0f;
-};
+        
+}; //class Clock
 
 class VEIL_EXPORT Window {
     public:
@@ -40,15 +47,15 @@ class VEIL_EXPORT Window {
 
         inline void setInputMode(int mode, int value) { glfwSetInputMode(m_window, mode, value); }
 
+        void setUpdateCallback(std::function<void()>&& loopFunc);
+        void setMouseCallback(std::function<void(double, double)>&& mouseFunc);
+        void setFramebufferCallback(std::function<void()>&& framebufferFunc);
+        void setKeyCallback(std::function<void(const KeyEvents&)>&& keyFunc);
+
         inline bool shouldClose() const { return glfwWindowShouldClose(m_window); }
         inline void pollEvents()  const { glfwPollEvents(); }
         inline void waitEvents()  const { glfwWaitEvents(); }
         inline void swapBuffers() const { glfwSwapBuffers(m_window); }
-
-        void setUpdateCallback(std::function<void()>&& loopFunc);
-        void setMouseCallback(std::function<void(double, double)>&& mouseFunc);
-        void setFramebufferCallback(std::function<void()>&& framebufferFunc);
-        void setKeyCallback(std::function<void(const KeyDownArray&)>&& keyFunc);
 
         int startUpdateLoop();
 
@@ -65,9 +72,9 @@ class VEIL_EXPORT Window {
         std::function<void()> m_loopFunc;
         std::function<void(double, double)> m_mouseFunc;
         std::function<void()> m_framebufferFunc;
-        std::function<void(const KeyDownArray&)> m_keyFunc;
+        std::function<void(const KeyEvents&)> m_keyFunc;
 
-        KeyDownArray m_keysDown{};
+        KeyEvents m_keyEvents{.keysDown={false}, .keysPressed={false}};
 
         static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
         static void framebufferCallback(GLFWwindow* window, int width, int height);

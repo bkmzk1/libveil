@@ -62,7 +62,7 @@ void Window::setFramebufferCallback(std::function<void()>&& framebufferFunc) {
     m_framebufferFunc = std::move(framebufferFunc);
     glfwSetFramebufferSizeCallback(m_window, &Window::framebufferCallback);
 }
-void Window::setKeyCallback(std::function<void(const KeyDownArray&)>&& keyFunc) {
+void Window::setKeyCallback(std::function<void(const KeyEvents&)>&& keyFunc) {
     
     m_keyFunc = std::move(keyFunc);
     glfwSetKeyCallback(m_window, &Window::keyCallback);
@@ -79,9 +79,13 @@ int Window::startUpdateLoop() {
 
         m_clock.tick();
 
+        this->pollEvents();
+
         try {
             if (m_keyFunc)
-                m_keyFunc(m_keysDown);
+                m_keyFunc(m_keyEvents);
+
+            std::fill(std::begin(m_keyEvents.keysPressed), std::end(m_keyEvents.keysPressed), false);
 
             m_loopFunc();
         }
@@ -92,7 +96,6 @@ int Window::startUpdateLoop() {
         }
 
         this->swapBuffers();
-        this->pollEvents();
     }
     return EXIT_SUCCESS;
 }
@@ -127,10 +130,12 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
     Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
-    if (action == GLFW_PRESS)
-        win->m_keysDown[key] = true;
+    if (action == GLFW_PRESS) {
+        win->m_keyEvents.keysDown[key] = true;
+        win->m_keyEvents.keysPressed[key] = true;
+    }
     else if (action == GLFW_RELEASE)
-        win->m_keysDown[key] = false;
+        win->m_keyEvents.keysDown[key] = false;
 }
 
 }; //namespace veil
