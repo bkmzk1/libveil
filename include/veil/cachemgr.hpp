@@ -23,7 +23,9 @@ class VEIL_EXPORT TextureStorage : public util::Singleton<TextureStorage> {
 
     public:
         ~TextureStorage(); 
-        Texture loadTexture(const std::string& path);
+        void shutdown();
+
+        const Texture* loadTexture(const std::string& path);
 
     private:
         TextureStorage() = default;
@@ -37,6 +39,7 @@ class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
 
     public:
         ~ModelStorage() = default;
+
         ModelInstance instantiate(const std::string& path) const;
         ModelInstance loadModel(const std::string& path);
 

@@ -13,27 +13,54 @@ namespace veil {
 class Shader;
 
 enum class DrawableType : uint8_t {
+
     MODEL_SINGULAR,
     MODEL_INSTANCED,
     UNKNOWN
 }; //enum class DrawableType
 
 struct VEIL_EXPORT Vertex {
+
     Vector3 position = { 0.0f, 0.0f, 0.0f };
     Vector3 normal = { 0.0f, 0.0f, 0.0f };
     Vector2 texuv = { 0.0f, 0.0f };
-
 }; //struct Vertex
 
 struct VEIL_EXPORT Texture {
+    
+    Texture() = default;
+    Texture(GLuint texID, const std::string& texPath) : id(texID), path(texPath) {}
+
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+
+    Texture(Texture&& other) noexcept : id(other.id) { 
+        other.id = 0; 
+    };
+    Texture& operator=(Texture&& other) noexcept {
+
+        if (this != &other) {
+            if (id != 0) 
+                glDeleteTextures(1, &id);
+            id = other.id;
+            other.id = 0;
+        }
+        return *this;
+    };
+
+    ~Texture() { 
+        if (id != 0) 
+            glDeleteTextures(1, &id); 
+    }
+
     GLuint id = 0u;
     std::string path = "\0";
 
 }; //struct Texture
 
 struct VEIL_EXPORT Material {
-    Texture diffuse;
-    Texture specular;
+    const Texture* diffuse = nullptr;
+    const Texture* specular = nullptr;
 
 }; //struct Material
 

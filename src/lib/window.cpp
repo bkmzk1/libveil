@@ -38,7 +38,6 @@ Window::Window(std::string_view title, const Vector2& windowSize) {
 
     glViewport(0, 0, windowSize.x, windowSize.y);
 }
-
 Window::~Window() {
     
     if (m_window) {

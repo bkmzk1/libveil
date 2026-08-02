@@ -7,35 +7,31 @@
 
 namespace veil {
 
-Texture TextureStorage::loadTexture(const std::string& path) {
+const Texture* TextureStorage::loadTexture(const std::string& path) {
 
-    if (path.empty() || path == "\0") {
-
-        std::cout << Log::message(LogType::WARNING, "Tried to load a texture with no path") << std::endl;
-        return Texture{0, "\0"};
-    }
+    if (path.empty() || path == "\0")
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load a texture from empty path"));
 
     auto it = m_cache.find(path);
     if (it != m_cache.end())
-        return it->second;
+        return &it->second;
 
     GLuint textureID = loadTextureFromFile(path);
-    Texture texture{textureID, path};
 
-    m_cache[path] = texture;
+    auto [insertedIt, success] = m_cache.try_emplace(path, textureID, path);
 
-    return texture;
+    return &insertedIt->second;
 } 
 
 TextureStorage::~TextureStorage() {
+    
+    if (!m_cache.empty())
+        m_cache.clear();
+}
+void TextureStorage::shutdown() {
 
-    auto& instance = getInstance();
-    for (const auto& [path, texture] : instance.m_cache) {
-        if (texture.id) {
-            glDeleteTextures(1, &texture.id);
-        }
-    }
-    instance.m_cache.clear();
+    if (!m_cache.empty())
+        m_cache.clear();
 }
 
 GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
@@ -103,7 +99,6 @@ const Model& ModelStorage::getModel(const std::string& path) const {
 
     return it->second;
 }
-
 ModelInstance ModelStorage::instantiate(const std::string& path) const {
 
     auto it = m_cache.find(path);
@@ -132,8 +127,8 @@ void ModelStorage::saveToBIN(const Model& model) const {
     for (const auto& mesh : meshes) {
 
         totalBytes += sizeof(util::BINCacheHeader);
-        totalBytes += mesh.getMaterial().diffuse.path.length();
-        totalBytes += mesh.getMaterial().specular.path.length();
+        totalBytes += mesh.getMaterial().diffuse->path.length();
+        totalBytes += mesh.getMaterial().specular->path.length();
         totalBytes += mesh.getVertices().size() * sizeof(Vertex);
         totalBytes += mesh.getIndices().size() * sizeof(unsigned int);
     }
@@ -145,25 +140,27 @@ void ModelStorage::saveToBIN(const Model& model) const {
     std::memcpy(bufferPtr, &meshNum, sizeof(meshNum));
     bufferPtr += sizeof(meshNum);
 
-    util::BINCacheHeader header;
-
     for (const auto& mesh : meshes) {
 
-        const auto& diffPath = mesh.getMaterial().diffuse.path;
-        const auto& specPath = mesh.getMaterial().specular.path;
+        util::BINCacheHeader header;
 
-        header.diffLen = static_cast<unsigned int>(diffPath.length());
-        header.specLen = static_cast<unsigned int>(specPath.length());
+        const auto& diffPath = mesh.getMaterial().diffuse->path;
+        const auto& specPath = mesh.getMaterial().specular->path;
+
+        const auto& mat = mesh.getMaterial();
+
+        header.diffLen = mat.diffuse ? static_cast<unsigned int>(mat.diffuse->path.length()) : 0;
+        header.specLen = mat.specular ? static_cast<unsigned int>(mat.specular->path.length()) : 0;
         header.vertCount = static_cast<unsigned int>(mesh.getVertices().size());
         header.indCount = static_cast<unsigned int>(mesh.getIndices().size());
         std::memcpy(bufferPtr, &header, sizeof(header));
         bufferPtr += sizeof(header);
 
-        if (header.diffLen > 0) {
+        if (header.diffLen > 0 && mat.diffuse) {
             std::memcpy(bufferPtr, diffPath.data(), header.diffLen);
             bufferPtr += header.diffLen;
         }
-        if (header.specLen > 0) {
+        if (header.specLen > 0 && mat.specular) {
             std::memcpy(bufferPtr, specPath.data(), header.specLen);
             bufferPtr += header.specLen;
         }
@@ -179,7 +176,6 @@ void ModelStorage::saveToBIN(const Model& model) const {
 
     out.write(fileBuffer.data(), totalBytes);
 }
-
 void ModelStorage::loadFromBIN(Model& model) {
 
     auto& meshes = model.getMeshesWrite();
@@ -213,21 +209,20 @@ void ModelStorage::loadFromBIN(Model& model) {
         std::memcpy(&header, bufferPtr, sizeof(header));
         bufferPtr += sizeof(header);
 
-        Texture diffTexture{0, "\0"};
+        Material material;
+
         if (header.diffLen > 0) {
 
             std::string diffPath(bufferPtr, header.diffLen);
             bufferPtr += header.diffLen;
-            diffTexture = TextureStorage::getInstance().loadTexture(diffPath);
+            material.diffuse = TextureStorage::getInstance().loadTexture(diffPath);
         }
-        Texture specTexture{0, "\0"};
         if (header.specLen > 0) {
 
             std::string specPath(bufferPtr, header.specLen);
             bufferPtr += header.specLen;
-            specTexture = TextureStorage::getInstance().loadTexture(specPath);
+            material.specular = TextureStorage::getInstance().loadTexture(specPath);
         }
-        Material material{diffTexture, specTexture};
 
         vertices.resize(header.vertCount);
         indices.resize(header.indCount);

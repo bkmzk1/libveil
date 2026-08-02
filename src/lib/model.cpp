@@ -213,8 +213,11 @@ void InstancedModels::render() const {
         const Material& material = mesh.getMaterial();
 
         glBindVertexArray(mesh.getVAO());
-        glBindTextureUnit(0, material.diffuse.id);
-        glBindTextureUnit(1, material.specular.id);
+
+        if (material.diffuse)
+            glBindTextureUnit(0, material.diffuse->id);
+        if (material.specular)
+            glBindTextureUnit(1, material.specular->id);
 
         glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
     }
