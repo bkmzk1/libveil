@@ -81,7 +81,7 @@ void Mesh::render() const {
     if (m_material.diffuse)
         glBindTextureUnit(0, m_material.diffuse->id);
     if (m_material.specular)
-    glBindTextureUnit(1, m_material.specular->id);
+        glBindTextureUnit(1, m_material.specular->id);
 
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
