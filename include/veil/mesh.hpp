@@ -14,10 +14,13 @@ namespace veil {
 class VEIL_EXPORT Mesh {
     public:
         Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, Material& material);
+
         Mesh(const Mesh&) = delete;
         Mesh& operator=(const Mesh&) = delete;
+        
         Mesh(Mesh&& other) noexcept;
         Mesh& operator=(Mesh&& other) noexcept;
+        
         ~Mesh();
         
         void render() const;

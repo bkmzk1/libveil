@@ -19,8 +19,11 @@ GLCamera::GLCamera(const Vector3& initPos, const Vector3& up, float aspectRatio,
 
 const Matrix4& GLCamera::getView() {
     
-    if (m_viewDirty) 
-        updateView();  
+    if (m_viewDirty) {
+
+        m_viewDirty = false;
+        updateView(); 
+    } 
     return m_view;
 }
 
@@ -52,12 +55,9 @@ void GLCamera::updateView() {
     float y = std::sin(glm::radians(m_pitch));
     float z = std::sin(glm::radians(m_yaw)) * std::cos(glm::radians(m_pitch));
     Vector3 forward(x, y, z);
-
     m_front = forward.normalized();
 
     m_view.makeView(m_position, m_position + m_front, m_up);
-
-    m_viewDirty = false;
 }
 
 void GLCamera::updateProjection(float fovyDeg, float aspectRatio) {

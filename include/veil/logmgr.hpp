@@ -22,7 +22,7 @@ enum class LogType : uint8_t {
     COUNT
 };
 
-struct VEIL_EXPORT Log : util::Singleton<Log> {
+class VEIL_EXPORT Log : util::Singleton<Log> {
 
     friend class util::Singleton<Log>;
 

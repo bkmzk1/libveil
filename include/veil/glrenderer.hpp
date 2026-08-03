@@ -28,7 +28,7 @@ class VEIL_EXPORT GLRenderer {
         GLRenderer() = default;
         ~GLRenderer() = default;
 
-        void setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc);
+        void setForTargetCallback(std::function<void(const Shader*, const IDrawable*)>&& forTargetFunc);
 
         void reserveShaders(const std::vector<const Shader*>& shaders);
         void addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets);
@@ -90,16 +90,14 @@ class VEIL_EXPORT GLRenderer {
         std::unordered_map<
             const Shader*, 
             std::vector<const IDrawable*> 
-
         > m_renderData;
 
         std::unordered_map<
             const Shader*, 
             std::vector<std::pair<GLint, std::function<void(const Shader&, GLint)> > >
-
         > m_uniformData;
 
-        std::function<void(const Shader*, const ModelInstance*)> m_forModelFunc;
+        std::function<void(const Shader*, const IDrawable*)> m_forTargetFunc;
 }; //class GLRenderer
 
 }; //namespace veil

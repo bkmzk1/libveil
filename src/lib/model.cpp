@@ -8,7 +8,6 @@ Model::Model(std::string_view path) {
     LogTimer lt(path);
 
     m_directory = std::filesystem::path(path).parent_path().string();
-
     std::string cacheFile = m_directory + g_cacheDir + g_cacheFile;
 
     if (std::filesystem::exists(cacheFile)) 
@@ -35,8 +34,9 @@ void Model::loadModel(std::string_view path) {
         aiProcess_ImproveCacheLocality
     );
 
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        throw veil::Exception(importer.GetErrorString());
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        throw veil::Exception(Log::message(LogType::CRITICAL, "{}", importer.GetErrorString()));
+    }
 
     processNode(scene->mRootNode, scene);
 
@@ -103,12 +103,12 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         if (aiMat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
             aiString relativePath;
             aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &relativePath);
-            material.diffuse = TextureStorage::getInstance().loadTexture(m_directory + '/' + relativePath.C_Str());
+            material.diffuse = &TextureStorage::getInstance().loadTexture(m_directory + '/' + relativePath.C_Str());
         }
         if (aiMat->GetTextureCount(aiTextureType_SPECULAR) > 0) {
             aiString relativePath;
             aiMat->GetTexture(aiTextureType_SPECULAR, 0, &relativePath);
-            material.specular = TextureStorage::getInstance().loadTexture(m_directory + '/' + relativePath.C_Str());
+            material.specular = &TextureStorage::getInstance().loadTexture(m_directory + '/' + relativePath.C_Str());
         }
     }
 
@@ -156,7 +156,8 @@ InstancedModels& InstancedModels::operator=(InstancedModels&& other) noexcept {
 
     if (this != &other) {
 
-        glDeleteBuffers(1, &m_instancesVBO);
+        if (m_instancesVBO) 
+            glDeleteBuffers(1, &m_instancesVBO);
 
         m_instancesVBO = other.m_instancesVBO;
         m_maxInstances = other.m_maxInstances;
@@ -213,8 +214,11 @@ void InstancedModels::render() const {
         const Material& material = mesh.getMaterial();
 
         glBindVertexArray(mesh.getVAO());
-        glBindTextureUnit(0, material.diffuse.id);
-        glBindTextureUnit(1, material.specular.id);
+
+        if (material.diffuse)
+            glBindTextureUnit(0, material.diffuse->id);
+        if (material.specular)
+            glBindTextureUnit(1, material.specular->id);
 
         glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
     }

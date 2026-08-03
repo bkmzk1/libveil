@@ -43,9 +43,9 @@ void GLRenderer::changeTargetShader(std::initializer_list<std::pair<const Shader
     }
 }
 
-void GLRenderer::setForModelCallback(std::function<void(const Shader*, const ModelInstance*)>&& forModelFunc) {
+void GLRenderer::setForTargetCallback(std::function<void(const Shader*, const IDrawable*)>&& forModelFunc) {
 
-    m_forModelFunc = std::move(forModelFunc);
+    m_forTargetFunc = std::move(forModelFunc);
 }
 
 void GLRenderer::callbackUniforms() const {
@@ -70,16 +70,16 @@ void GLRenderer::callbackRender() const {
     for (const auto& data : m_renderData) {
 
         const auto& shader = data.first;
-        const auto& models = data.second;
+        const auto& targets = data.second;
 
         shader->useProgram();
 
-        for (const auto& model : models) {
+        for (const auto& target : targets) {
 
-            if (m_forModelFunc && model->getType() == DrawableType::MODEL_SINGULAR)
-                m_forModelFunc(shader, static_cast<const ModelInstance*>(model));
+            if (m_forTargetFunc)
+                m_forTargetFunc(shader, target);
             
-            model->render();
+            target->render();
         }
     }
 }

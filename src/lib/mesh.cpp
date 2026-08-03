@@ -50,9 +50,9 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 
     if (this != &other) {
 
-        glDeleteVertexArrays(1, &m_vao);
-        glDeleteBuffers(1, &m_vbo);
-        glDeleteBuffers(1, &m_ebo);
+        if (m_vao) glDeleteVertexArrays(1, &m_vao);
+        if (m_vbo) glDeleteBuffers(1, &m_vbo);
+        if (m_ebo) glDeleteBuffers(1, &m_ebo);
 
         m_vertices = std::move(other.m_vertices);
         m_indices = std::move(other.m_indices);
@@ -78,8 +78,10 @@ Mesh::~Mesh() {
 
 void Mesh::render() const {
 
-    glBindTextureUnit(0, m_material.diffuse.id);
-    glBindTextureUnit(1, m_material.specular.id);
+    if (m_material.diffuse)
+        glBindTextureUnit(0, m_material.diffuse->id);
+    if (m_material.specular)
+    glBindTextureUnit(1, m_material.specular->id);
 
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);

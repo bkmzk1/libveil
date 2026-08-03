@@ -26,10 +26,9 @@ class VEIL_EXPORT Model {
 
         Model(const Model&) = delete;
         Model& operator=(const Model&) = delete;
+
         Model(Model&&) noexcept = default;
         Model& operator=(Model&&) noexcept = default;
-
-        ~Model() = default;
         
         void render() const; 
 
@@ -53,6 +52,7 @@ class VEIL_EXPORT ModelInstance : public IDrawable {
 
         ModelInstance(const ModelInstance&) = delete;
         ModelInstance& operator=(const ModelInstance&) = delete;
+        
         ModelInstance(ModelInstance&&) noexcept = default;
         ModelInstance& operator=(ModelInstance&&) noexcept = default;
 

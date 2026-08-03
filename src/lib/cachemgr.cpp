@@ -7,35 +7,30 @@
 
 namespace veil {
 
-Texture TextureStorage::loadTexture(const std::string& path) {
+const Texture& TextureStorage::loadTexture(const std::string& path) {
+
+    static Texture emptyTexture{0, "\0"};
 
     if (path.empty() || path == "\0") {
 
         std::cout << Log::message(LogType::WARNING, "Tried to load a texture with no path") << std::endl;
-        return Texture{0, "\0"};
+        return emptyTexture;
     }
 
-    auto it = m_cache.find(path);
-    if (it != m_cache.end())
-        return it->second;
+    auto cacheIt = m_cache.find(path);
+    if (cacheIt != m_cache.end())
+        return cacheIt->second;
 
     GLuint textureID = loadTextureFromFile(path);
-    Texture texture{textureID, path};
 
-    m_cache[path] = texture;
-
-    return texture;
+    auto [insertedIt, success] = m_cache.try_emplace(path, textureID, path);
+    return insertedIt->second;
 } 
 
 TextureStorage::~TextureStorage() {
-
-    auto& instance = getInstance();
-    for (const auto& [path, texture] : instance.m_cache) {
-        if (texture.id) {
-            glDeleteTextures(1, &texture.id);
-        }
-    }
-    instance.m_cache.clear();
+    
+    if (!m_cache.empty())
+        m_cache.clear();
 }
 
 GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
@@ -68,22 +63,23 @@ GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
         dataFormat = GL_RGBA;
     }
 
+    int mipLevels = static_cast<int>(std::floor(std::log2(std::max(width, height))) + 1);
+
     GLuint textureID;
- 
     glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
-    glTextureStorage2D(textureID, 1, internalFormat, width, height);
+    glTextureStorage2D(textureID, mipLevels, internalFormat, width, height);
     glTextureSubImage2D(textureID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
+    glGenerateTextureMipmap(textureID);
 
     glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_image_free(data);
 
     return textureID;
 }
-
 ModelInstance ModelStorage::loadModel(const std::string& path) {
     
     auto it = m_cache.find(path);
@@ -103,7 +99,6 @@ const Model& ModelStorage::getModel(const std::string& path) const {
 
     return it->second;
 }
-
 ModelInstance ModelStorage::instantiate(const std::string& path) const {
 
     auto it = m_cache.find(path);
@@ -131,9 +126,11 @@ void ModelStorage::saveToBIN(const Model& model) const {
 
     for (const auto& mesh : meshes) {
 
+        const auto& mat = mesh.getMaterial();
+
         totalBytes += sizeof(util::BINCacheHeader);
-        totalBytes += mesh.getMaterial().diffuse.path.length();
-        totalBytes += mesh.getMaterial().specular.path.length();
+        totalBytes += mat.diffuse ? mat.diffuse->path.length() : 0;
+        totalBytes += mat.specular ? mat.specular->path.length() : 0;
         totalBytes += mesh.getVertices().size() * sizeof(Vertex);
         totalBytes += mesh.getIndices().size() * sizeof(unsigned int);
     }
@@ -149,8 +146,10 @@ void ModelStorage::saveToBIN(const Model& model) const {
 
     for (const auto& mesh : meshes) {
 
-        const auto& diffPath = mesh.getMaterial().diffuse.path;
-        const auto& specPath = mesh.getMaterial().specular.path;
+        const auto& mat = mesh.getMaterial();
+
+        const auto& diffPath = mat.diffuse ? mat.diffuse->path : "";
+        const auto& specPath = mat.specular ? mat.specular->path : "f";
 
         header.diffLen = static_cast<unsigned int>(diffPath.length());
         header.specLen = static_cast<unsigned int>(specPath.length());
@@ -204,30 +203,29 @@ void ModelStorage::loadFromBIN(Model& model) {
 
     meshes.reserve(meshNum);
 
-    for (unsigned int i = 0; i < meshNum; ++i) {
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    util::BINCacheHeader header;
 
-        std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
-        util::BINCacheHeader header;
+    for (unsigned int i = 0; i < meshNum; ++i) {
 
         std::memcpy(&header, bufferPtr, sizeof(header));
         bufferPtr += sizeof(header);
 
-        Texture diffTexture{0, "\0"};
+        Material material;
+
         if (header.diffLen > 0) {
 
             std::string diffPath(bufferPtr, header.diffLen);
             bufferPtr += header.diffLen;
-            diffTexture = TextureStorage::getInstance().loadTexture(diffPath);
+            material.diffuse = &TextureStorage::getInstance().loadTexture(diffPath);
         }
-        Texture specTexture{0, "\0"};
         if (header.specLen > 0) {
 
             std::string specPath(bufferPtr, header.specLen);
             bufferPtr += header.specLen;
-            specTexture = TextureStorage::getInstance().loadTexture(specPath);
+            material.specular = &TextureStorage::getInstance().loadTexture(specPath);
         }
-        Material material{diffTexture, specTexture};
 
         vertices.resize(header.vertCount);
         indices.resize(header.indCount);
