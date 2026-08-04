@@ -15,7 +15,7 @@
 
 namespace veil {
 
-struct GLCamera;
+class GLCamera;
 
 using KeyArray = std::array<bool, GLFW_KEY_LAST + 1>;
 

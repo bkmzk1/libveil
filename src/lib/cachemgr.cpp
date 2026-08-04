@@ -154,7 +154,7 @@ void ModelStorage::saveToBIN(const Model& model) const {
         const auto& mat = mesh.getMaterial();
 
         const auto& diffPath = mat.diffuse ? mat.diffuse->path : "";
-        const auto& specPath = mat.specular ? mat.specular->path : "f";
+        const auto& specPath = mat.specular ? mat.specular->path : "";
 
         header.diffLen = static_cast<unsigned int>(diffPath.length());
         header.specLen = static_cast<unsigned int>(specPath.length());
