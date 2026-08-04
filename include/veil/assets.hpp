@@ -13,9 +13,10 @@ namespace veil {
 class Shader;
 
 enum class DrawableType : uint8_t {
+
+    UNKNOWN,
     MODEL_SINGULAR,
-    MODEL_INSTANCED,
-    UNKNOWN
+    MODEL_INSTANCED
 }; //enum class DrawableType
 
 struct VEIL_EXPORT Vertex {

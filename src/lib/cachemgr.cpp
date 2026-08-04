@@ -32,6 +32,11 @@ TextureStorage::~TextureStorage() {
     if (!m_cache.empty())
         m_cache.clear();
 }
+void TextureStorage::shutdown() {
+
+    if (!m_cache.empty())
+        m_cache.clear();
+}
 
 GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
 

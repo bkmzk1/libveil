@@ -13,4 +13,3 @@
 #include "veil/math.hpp"
 
 //TODO: Make more idrawables
-//FIXME: The destructor of TextureStorage

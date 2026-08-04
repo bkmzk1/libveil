@@ -23,6 +23,7 @@ class VEIL_EXPORT TextureStorage : public util::Singleton<TextureStorage> {
 
     public:
         ~TextureStorage(); 
+        void shutdown();
         const Texture& loadTexture(const std::string& path);
         
     private:
