@@ -32,16 +32,16 @@ class VEIL_EXPORT Log : util::Singleton<Log> {
         static std::string message(LogType type, std::format_string<Args...> fmt, Args&&... args) {
 
             std::string formatted = std::format(fmt, std::forward<Args>(args)...);
-            std::string msg = "VEIL::" + typeToString(type) + ": " + formatted;
+            std::string msg = "VEIL::" + std::string(typeToString(type)) + ": " + formatted;
 
             return msg;
         }
 
     private:
         Log() = default;
-        constexpr static std::string typeToString(LogType type) {
+        constexpr static std::string_view typeToString(LogType type) {
 
-            constexpr std::array<std::string, static_cast<size_t>(LogType::COUNT)> names = {
+            constexpr std::array<std::string_view, static_cast<size_t>(LogType::COUNT)> names = {
                 "INFO",
                 "WARNING",
                 "CRITICAL"
