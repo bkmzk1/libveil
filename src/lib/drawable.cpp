@@ -3,26 +3,6 @@
 
 namespace veil {
 
-ModelInstance::ModelInstance(const Model& base) : m_base(base) {
-    
-    m_modelMatrix = Matrix4(1.0f);
-}
-
-void ModelInstance::render() const {
-
-    m_base.render();
-}
-
-void ModelInstance::translate(const Vector3& translationVec) {
-    m_modelMatrix.translate(translationVec);
-}
-void ModelInstance::rotate(float deg, const Vector3& rotateDir) {
-    m_modelMatrix.rotate(deg, rotateDir);
-}
-void ModelInstance::scale(const Vector3& scaleRatio) {
-    m_modelMatrix.scale(scaleRatio);
-}
-
 InstancedModels::InstancedModels(const Model& base, size_t maxInstances) : m_base(base) {
 
     m_maxInstances = maxInstances;

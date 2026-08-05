@@ -12,9 +12,22 @@ namespace veil {
 enum class DrawableType : uint8_t {
 
     UNKNOWN,
+    MESH_SINGULAR,
     MODEL_SINGULAR,
     MODEL_INSTANCED
 }; //enum class DrawableType
+
+template <typename T>
+struct DrawableTraits {
+};
+template <>
+struct DrawableTraits<Model> {
+    static constexpr DrawableType type = DrawableType::MODEL_SINGULAR;
+};
+template <>
+struct DrawableTraits<Mesh> {
+    static constexpr DrawableType type = DrawableType::MESH_SINGULAR;
+};
 
 class VEIL_EXPORT IDrawable {
     public:
@@ -30,32 +43,34 @@ class VEIL_EXPORT IDrawable {
         mutable const Shader* m_currentShader = nullptr;
 }; //class IDrawable
 
-class VEIL_EXPORT ModelInstance : public IDrawable {
+template<typename T>
+class Instance : public IDrawable {
     public:
-        ModelInstance() = delete;
-        ModelInstance(const Model& base);
+        Instance() = delete;
+        inline Instance(const T& base) : m_base(base) { }
 
-        ModelInstance(const ModelInstance&) = delete;
-        ModelInstance& operator=(const ModelInstance&) = delete;
-        
-        ModelInstance(ModelInstance&&) noexcept = default;
-        ModelInstance& operator=(ModelInstance&&) noexcept = default;
+        Instance(const Instance&) = delete;
+        Instance& operator=(const Instance&) = delete;
 
-        virtual ~ModelInstance() = default;
+        virtual ~Instance() = default;
 
-        void render() const override;
-        void translate(const Vector3& translationVec);
-        void rotate(float deg, const Vector3& rotateDir);
-        void scale(const Vector3& scaleRatio);
+        inline void render() const override { m_base.render(); }
 
-        inline const Model& getBase() const { return m_base; }
+        inline void translate(const Vector3& translationVec) { m_modelMatrix.translate(translationVec); }
+        inline void rotate(float deg, const Vector3& rotateDir) { m_modelMatrix.rotate(deg, rotateDir); }
+        inline void scale(const Vector3& scaleRatio) { m_modelMatrix.scale(scaleRatio); }
+
+        inline const T& getBase() const { return m_base; }
         inline const Matrix4& getModelMat() const { return m_modelMatrix; }
-        inline DrawableType getType() const override { return DrawableType::MODEL_SINGULAR; }
-
+        inline DrawableType getType() const override { return DrawableTraits<T>::type; }
+    
     private:
-        const Model& m_base;
-        Matrix4 m_modelMatrix;
-}; //class ModelInstance
+        const T& m_base;
+        Matrix4 m_modelMatrix{1.0f};
+};
+
+using ModelInstance = Instance<Model>;
+using MeshInstance = Instance<Mesh>;
 
 class VEIL_EXPORT InstancedModels : public IDrawable {
     public:

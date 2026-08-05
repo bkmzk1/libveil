@@ -16,7 +16,11 @@ constexpr const char g_cacheFile[11] = "/cache.bin";
 constexpr const char g_cacheDir[8]  = "/.cache";
 
 class Model;
-class ModelInstance;
+
+template<typename T>
+class Instance;
+
+using ModelInstance = Instance<Model>;
 
 struct BINCacheHeader {
 
