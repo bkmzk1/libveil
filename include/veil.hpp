@@ -5,11 +5,12 @@
 #include "veil/window.hpp"
 #include "veil/shader.hpp"
 #include "veil/glcamera.hpp"
-#include "veil/mesh.hpp"
 #include "veil/model.hpp"
-#include "veil/cachemgr.hpp"
-#include "veil/logmgr.hpp"
-#include "veil/glrenderer.hpp"
+#include "veil/cache.hpp"
+#include "veil/log.hpp"
+#include "veil/renderer.hpp"
 #include "veil/math.hpp"
+#include "veil/drawable.hpp"
 
 //TODO: Make more idrawables
+//TODO: Texture atlases

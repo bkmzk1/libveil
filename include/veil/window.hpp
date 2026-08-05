@@ -10,12 +10,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "logmgr.hpp"
+#include "log.hpp"
 #include "assets.hpp"
 
 namespace veil {
-
-class GLCamera;
 
 using KeyArray = std::array<bool, GLFW_KEY_LAST + 1>;
 
@@ -38,11 +36,15 @@ class VEIL_EXPORT Clock {
 
 class VEIL_EXPORT Window {
     public:
+        Window() = delete;
         Window(std::string_view title, const Vector2& windowSize);
+
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
+
         Window(Window&&) = delete;
         Window& operator=(Window&&) = delete;
+
         ~Window(); 
 
         inline void setInputMode(int mode, int value) { glfwSetInputMode(m_window, mode, value); }

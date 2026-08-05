@@ -9,17 +9,19 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "assets.hpp"
-#include "logmgr.hpp"
+#include "log.hpp"
 #include "math.hpp"
 
 namespace veil {
 
 class VEIL_EXPORT Shader {
     public:
-        explicit Shader(std::initializer_list<std::pair<std::string_view, GLenum>> sources);
+        Shader() = delete;
+        Shader(std::initializer_list<std::pair<std::string_view, GLenum>> sources);
 
         Shader(const Shader&) = delete;
         Shader& operator=(const Shader&) = delete;
+        
         Shader(Shader&&) noexcept;
         Shader& operator=(Shader&&) noexcept;
 

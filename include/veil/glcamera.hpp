@@ -13,9 +13,8 @@ namespace veil {
 
 class VEIL_EXPORT GLCamera {
     public: 
-        GLCamera() = delete;
+        GLCamera() = default;
         GLCamera(const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg);
-        ~GLCamera() = default;
 
         void calculateAttitude(double xpos, double ypos);
         void updateView();
@@ -23,8 +22,8 @@ class VEIL_EXPORT GLCamera {
         void resyncMouse();
         void move(const Vector3& factor);
 
-        const Matrix4& getView();
         inline const Matrix4& getProjection() const { return m_projection; }
+        const Matrix4& getView();
         inline const Vector3& getPosition() const { return m_position; }
         inline const Vector3& getUp() const { return m_up; }
         inline const Vector3& getFront() const { return m_front; }

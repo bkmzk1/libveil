@@ -7,21 +7,50 @@
 #include <fstream>
 #include <filesystem>
 #include <span>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "assets.hpp"
 #include "shader.hpp"
-#include "mesh.hpp"
-#include "cachemgr.hpp"
-#include "logmgr.hpp"
+#include "cache.hpp"
+#include "log.hpp"
 #include "math.hpp"
 
 namespace veil {
 
+class VEIL_EXPORT Mesh {
+    public:
+        Mesh() = delete;
+        Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, Material& material);
+
+        Mesh(const Mesh&) = delete;
+        Mesh& operator=(const Mesh&) = delete;
+        
+        Mesh(Mesh&& other) noexcept;
+        Mesh& operator=(Mesh&& other) noexcept;
+        
+        ~Mesh();
+        
+        void render() const;
+
+        inline const std::span<const Vertex> getVertices() const { return m_vertices; }
+        inline const std::span<const unsigned int> getIndices() const { return m_indices; }
+        inline const Material& getMaterial() const { return m_material; }
+        inline const GLuint getVAO() const { return m_vao; }
+        
+    private:
+        std::vector<Vertex> m_vertices;
+        std::vector<unsigned int> m_indices;
+        Material m_material;
+
+        GLuint m_vao, m_vbo, m_ebo;
+}; //class Mesh
+
 class VEIL_EXPORT Model {
     public:
+        Model() = delete;
         explicit Model(std::string_view path);
 
         Model(const Model&) = delete;
@@ -44,61 +73,5 @@ class VEIL_EXPORT Model {
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 }; //class Model
-
-class VEIL_EXPORT ModelInstance : public IDrawable {
-    public:
-        ModelInstance() = delete;
-        ModelInstance(const Model& base);
-
-        ModelInstance(const ModelInstance&) = delete;
-        ModelInstance& operator=(const ModelInstance&) = delete;
-        
-        ModelInstance(ModelInstance&&) noexcept = default;
-        ModelInstance& operator=(ModelInstance&&) noexcept = default;
-
-        virtual ~ModelInstance() = default;
-
-        void render() const override;
-
-        void translate(const Vector3& translationVec);
-        void rotate(float deg, const Vector3& rotateDir);
-        void scale(const Vector3& scaleRatio);
-
-        inline const Model& getBase() const { return m_base; }
-        inline const Matrix4& getModelMat() const { return m_modelMatrix; }
-
-        inline DrawableType getType() const override { return DrawableType::MODEL_SINGULAR; }
-
-    private:
-        const Model& m_base;
-        Matrix4 m_modelMatrix;
-}; //class ModelInstance
-
-class VEIL_EXPORT InstancedModels : public IDrawable {
-    public:
-        InstancedModels(const Model& base, size_t maxInstances);
-
-        InstancedModels(const InstancedModels&) = delete;
-        InstancedModels& operator=(const InstancedModels&) = delete;
-
-        InstancedModels(InstancedModels&&) noexcept;
-        InstancedModels& operator=(InstancedModels&&) noexcept;
-
-        virtual ~InstancedModels();
-
-        void setInstances(std::span<const Matrix4> instances);
-        void setInstanceAttribute(const Shader& shader, std::string_view attribName);
-
-        void render() const override;
-
-        inline DrawableType getType() const override { return DrawableType::MODEL_INSTANCED; }
-
-    private:
-        const Model& m_base; 
-
-        GLuint m_instancesVBO = 0;
-        size_t m_maxInstances = 0;
-        size_t m_instancesCount = 0;
-}; //class InstancedModels
 
 }; //namespace veil

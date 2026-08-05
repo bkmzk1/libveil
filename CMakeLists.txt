@@ -27,11 +27,11 @@ add_library(veil SHARED
     src/lib/window.cpp
     src/lib/shader.cpp
     src/lib/glcamera.cpp
-    src/lib/mesh.cpp
     src/lib/model.cpp
-    src/lib/cachemgr.cpp
-    src/lib/logmgr.cpp
-    src/lib/glrenderer.cpp
+    src/lib/cache.cpp
+    src/lib/log.cpp
+    src/lib/renderer.cpp
+    src/lib/drawable.cpp
 )
 add_executable(main #WIN32 
     src/app/main.cpp

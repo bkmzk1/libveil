@@ -1,6 +1,7 @@
 
-#include <veil/cachemgr.hpp>
+#include <veil/cache.hpp>
 #include <veil/model.hpp>
+#include <veil/drawable.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -127,13 +128,13 @@ void ModelStorage::saveToBIN(const Model& model) const {
     if (!out.is_open())
         throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile));
 
-    size_t totalBytes = sizeof(unsigned int);
+    size_t totalBytes = sizeof(size_t);
 
     for (const auto& mesh : meshes) {
 
         const auto& mat = mesh.getMaterial();
 
-        totalBytes += sizeof(util::BINCacheHeader);
+        totalBytes += sizeof(BINCacheHeader);
         totalBytes += mat.diffuse ? mat.diffuse->path.length() : 0;
         totalBytes += mat.specular ? mat.specular->path.length() : 0;
         totalBytes += mesh.getVertices().size() * sizeof(Vertex);
@@ -143,23 +144,22 @@ void ModelStorage::saveToBIN(const Model& model) const {
     std::vector<char> fileBuffer(totalBytes);
     char* bufferPtr = fileBuffer.data();
 
-    unsigned int meshNum = static_cast<unsigned int>(meshes.size());
+    size_t meshNum = meshes.size();
     std::memcpy(bufferPtr, &meshNum, sizeof(meshNum));
     bufferPtr += sizeof(meshNum);
 
-    util::BINCacheHeader header;
+    BINCacheHeader header;
 
     for (const auto& mesh : meshes) {
 
         const auto& mat = mesh.getMaterial();
-
         const auto& diffPath = mat.diffuse ? mat.diffuse->path : "";
         const auto& specPath = mat.specular ? mat.specular->path : "";
 
-        header.diffLen = static_cast<unsigned int>(diffPath.length());
-        header.specLen = static_cast<unsigned int>(specPath.length());
-        header.vertCount = static_cast<unsigned int>(mesh.getVertices().size());
-        header.indCount = static_cast<unsigned int>(mesh.getIndices().size());
+        header.diffLen = diffPath.length();
+        header.specLen = specPath.length();
+        header.vertCount = mesh.getVertices().size();
+        header.indCount  = mesh.getIndices().size();
         std::memcpy(bufferPtr, &header, sizeof(header));
         bufferPtr += sizeof(header);
 
@@ -202,7 +202,7 @@ void ModelStorage::loadFromBIN(Model& model) {
     
     const char* bufferPtr = fileBuffer.data();
 
-    unsigned int meshNum = 0;
+    size_t meshNum = 0;
     std::memcpy(&meshNum, bufferPtr, sizeof(meshNum));
     bufferPtr += sizeof(meshNum);
 
@@ -210,9 +210,9 @@ void ModelStorage::loadFromBIN(Model& model) {
 
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    util::BINCacheHeader header;
+    BINCacheHeader header;
 
-    for (unsigned int i = 0; i < meshNum; ++i) {
+    for (size_t i = 0; i < meshNum; ++i) {
 
         std::memcpy(&header, bufferPtr, sizeof(header));
         bufferPtr += sizeof(header);

@@ -20,7 +20,7 @@ enum class LogType : uint8_t {
     WARNING,
     CRITICAL,
     COUNT
-};
+}; //enum class LogType
 
 class VEIL_EXPORT Log : util::Singleton<Log> {
 
@@ -50,8 +50,7 @@ class VEIL_EXPORT Log : util::Singleton<Log> {
             if (index >= names.size())
                 return "UNKNOWN";
             return names[index];
-        }
-        
+        }    
 }; //class Log
 
 class VEIL_EXPORT LogTimer {

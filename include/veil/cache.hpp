@@ -7,15 +7,25 @@
 #include <string_view>
 
 #include "assets.hpp"
-#include "logmgr.hpp"
+#include "log.hpp"
 
 namespace veil {
 
+//FIXME: Use filesystem not string concat
 constexpr const char g_cacheFile[11] = "/cache.bin";
 constexpr const char g_cacheDir[8]  = "/.cache";
 
 class Model;
 class ModelInstance;
+
+struct BINCacheHeader {
+
+    size_t diffLen = 0;
+    size_t specLen = 0;
+    size_t vertCount = 0;
+    size_t indCount = 0;
+
+}; //struct BINCacheHeader
 
 class VEIL_EXPORT TextureStorage : public util::Singleton<TextureStorage> {
 

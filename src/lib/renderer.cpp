@@ -1,15 +1,15 @@
 
-#include "veil/glrenderer.hpp"
+#include "veil/renderer.hpp"
 
 namespace veil {
 
-void GLRenderer::reserveShaders(const std::vector<const Shader*>& shaders) {
+void Renderer::reserveShaders(const std::vector<const Shader*>& shaders) {
 
     for (const auto& shader : shaders) 
         m_renderData.try_emplace(shader, 0);
 }
 
-void GLRenderer::addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
+void Renderer::addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
@@ -20,7 +20,7 @@ void GLRenderer::addTargets(std::initializer_list<std::pair<const Shader&, const
         drawable->setCurrentShader(shader);
     }
 }
-void GLRenderer::changeTargetShader(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
+void Renderer::changeTargetShader(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
@@ -43,12 +43,12 @@ void GLRenderer::changeTargetShader(std::initializer_list<std::pair<const Shader
     }
 }
 
-void GLRenderer::setForTargetCallback(std::function<void(const Shader*, const IDrawable*)>&& forModelFunc) {
+void Renderer::setForTargetCallback(std::function<void(const Shader*, const IDrawable*)>&& forModelFunc) {
 
     m_forTargetFunc = std::move(forModelFunc);
 }
 
-void GLRenderer::callbackUniforms() const {
+void Renderer::callbackUniforms() const {
 
     if (m_uniformData.empty())
         return;
@@ -62,7 +62,7 @@ void GLRenderer::callbackUniforms() const {
     }
 }
 
-void GLRenderer::callbackRender() const {
+void Renderer::callbackRender() const {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

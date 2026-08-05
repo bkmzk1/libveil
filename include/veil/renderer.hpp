@@ -10,10 +10,9 @@
 #include <string_view>
 #include <glad/glad.h>
 
-#include "model.hpp"
 #include "shader.hpp"
-#include "assets.hpp"
-#include "logmgr.hpp"
+#include "log.hpp"
+#include "drawable.hpp"
 
 namespace veil {
 
@@ -23,17 +22,17 @@ constexpr inline void initRenderingFlags() {
     glEnable(GL_CULL_FACE); 
 }
 
-class VEIL_EXPORT GLRenderer {
+class VEIL_EXPORT Renderer {
     public:
-        GLRenderer() = default;
-        ~GLRenderer() = default;
+        Renderer() = default;
+        ~Renderer() = default;
 
         void setForTargetCallback(std::function<void(const Shader*, const IDrawable*)>&& forTargetFunc);
 
         void reserveShaders(const std::vector<const Shader*>& shaders);
         void addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets);
         void changeTargetShader(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets);
-        
+
         template<typename T> 
         void uploadUniform(const Shader& shader, std::string_view uniformName, T&& v) {
             
@@ -85,6 +84,7 @@ class VEIL_EXPORT GLRenderer {
         void callbackRender() const;
 
         inline const auto& getRenderData() const { return m_renderData; }
+        inline const auto& getUniformData() const { return m_uniformData; }
 
     private:
         std::unordered_map<
@@ -98,6 +98,6 @@ class VEIL_EXPORT GLRenderer {
         > m_uniformData;
 
         std::function<void(const Shader*, const IDrawable*)> m_forTargetFunc;
-}; //class GLRenderer
+}; //class Renderer
 
 }; //namespace veil

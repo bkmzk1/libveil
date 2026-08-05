@@ -3,6 +3,91 @@
 
 namespace veil {
 
+Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, Material& material) {
+
+    m_vertices = std::move(vertices);
+    m_indices = std::move(indices);
+    m_material = material;
+
+    glCreateVertexArrays(1, &m_vao);
+    glCreateBuffers(1, &m_vbo);
+    glCreateBuffers(1, &m_ebo);
+
+    glNamedBufferStorage(m_vbo, m_vertices.size()*sizeof(Vertex), &m_vertices[0], 0);
+    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, sizeof(Vertex));
+
+    glNamedBufferStorage(m_ebo, m_indices.size()*sizeof(unsigned int), &m_indices[0], 0);
+    glVertexArrayElementBuffer(m_vao, m_ebo);
+
+    glEnableVertexArrayAttrib(m_vao, 0);
+    glVertexArrayAttribBinding(m_vao, 0, 0);
+    glVertexArrayAttribFormat(m_vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
+
+    glEnableVertexArrayAttrib(m_vao, 1);
+    glVertexArrayAttribBinding(m_vao, 1, 0);
+    glVertexArrayAttribFormat(m_vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
+    
+    glEnableVertexArrayAttrib(m_vao, 2);
+    glVertexArrayAttribBinding(m_vao, 2, 0);
+    glVertexArrayAttribFormat(m_vao, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, texuv));
+}
+
+Mesh::Mesh(Mesh&& other) noexcept {
+
+    m_vertices = std::move(other.m_vertices);
+    m_indices = std::move(other.m_indices);
+    m_material = other.m_material;
+    m_vao = other.m_vao;
+    m_vbo = other.m_vbo;
+    m_ebo = other.m_ebo;
+
+    other.m_vao = 0;
+    other.m_vbo = 0;
+    other.m_ebo = 0;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept {
+
+    if (this != &other) {
+
+        if (m_vao) glDeleteVertexArrays(1, &m_vao);
+        if (m_vbo) glDeleteBuffers(1, &m_vbo);
+        if (m_ebo) glDeleteBuffers(1, &m_ebo);
+
+        m_vertices = std::move(other.m_vertices);
+        m_indices = std::move(other.m_indices);
+        m_material = other.m_material;
+        m_vao = other.m_vao;
+        m_vbo = other.m_vbo;
+        m_ebo = other.m_ebo;
+
+        other.m_vao = 0;
+        other.m_vbo = 0;
+        other.m_ebo = 0;
+
+    }
+    return *this;
+}
+
+Mesh::~Mesh() {
+    
+    if (m_vao) glDeleteVertexArrays(1, &m_vao);
+    if (m_vbo) glDeleteBuffers(1, &m_vbo);
+    if (m_ebo) glDeleteBuffers(1, &m_ebo);
+}
+
+void Mesh::render() const {
+
+    if (m_material.diffuse)
+        glBindTextureUnit(0, m_material.diffuse->id);
+    if (m_material.specular)
+        glBindTextureUnit(1, m_material.specular->id);
+
+    glBindVertexArray(m_vao);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+
 Model::Model(std::string_view path) {
 
     LogTimer lt(path);
@@ -113,115 +198,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     }
 
     return Mesh(std::move(vertices), std::move(indices), material);
-}
-
-ModelInstance::ModelInstance(const Model& base) : m_base(base) {
-    
-    m_modelMatrix = Matrix4(1.0f);
-}
-
-void ModelInstance::render() const {
-
-    m_base.render();
-}
-
-void ModelInstance::translate(const Vector3& translationVec) {
-    m_modelMatrix.translate(translationVec);
-}
-void ModelInstance::rotate(float deg, const Vector3& rotateDir) {
-    m_modelMatrix.rotate(deg, rotateDir);
-}
-void ModelInstance::scale(const Vector3& scaleRatio) {
-    m_modelMatrix.scale(scaleRatio);
-}
-
-InstancedModels::InstancedModels(const Model& base, size_t maxInstances) : m_base(base) {
-
-    m_maxInstances = maxInstances;
-
-    glCreateBuffers(1, &m_instancesVBO);
-    glNamedBufferData(m_instancesVBO, maxInstances * sizeof(Matrix4), nullptr, GL_STATIC_DRAW);
-}
-
-InstancedModels::InstancedModels(InstancedModels&& other) noexcept : m_base(std::move(other.m_base)) {
-
-    m_instancesVBO = other.m_instancesVBO;
-    m_maxInstances = other.m_maxInstances;
-    m_instancesCount = other.m_instancesCount;
-
-    other.m_instancesVBO = 0;
-}
-
-InstancedModels& InstancedModels::operator=(InstancedModels&& other) noexcept {
-
-    if (this != &other) {
-
-        if (m_instancesVBO) 
-            glDeleteBuffers(1, &m_instancesVBO);
-
-        m_instancesVBO = other.m_instancesVBO;
-        m_maxInstances = other.m_maxInstances;
-        m_instancesCount = other.m_instancesCount;
-
-        other.m_instancesVBO = 0;
-    }
-    return *this;
-}
-
-InstancedModels::~InstancedModels() {
-
-    if (m_instancesVBO)
-        glDeleteBuffers(1, &m_instancesVBO);
-}
-
-void InstancedModels::setInstances(std::span<const Matrix4> instances) {
-
-    if (instances.size() > m_maxInstances)
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Too many instances '{}' ", instances.size()));
-
-    m_instancesCount = instances.size();
-    glNamedBufferSubData(m_instancesVBO, 0, m_instancesCount * sizeof(Matrix4), &instances[0]);
-}
-
-void InstancedModels::setInstanceAttribute(const Shader& shader, std::string_view name) {
-
-    GLint modelAttribLocation = glGetAttribLocation(shader.getID(), name.data());
-
-    if (modelAttribLocation < 0)
-        throw veil::Exception(Log::message(LogType::CRITICAL, "No uniform attribute found '{}'", name));
-
-    for (const auto& mesh : m_base.getMeshesRead()) {
-
-        GLuint vao = mesh.getVAO();
-
-        glVertexArrayVertexBuffer(vao, 1, m_instancesVBO, 0, sizeof(Matrix4));
-        glVertexArrayBindingDivisor(vao, 1, 1);
-
-        for (int i = 0; i < 4; ++i) {
-
-            GLuint loc = modelAttribLocation + i;
-            glEnableVertexArrayAttrib(vao, loc);
-            glVertexArrayAttribBinding(vao, loc, 1);
-            glVertexArrayAttribFormat(vao, loc, 4, GL_FLOAT, GL_FALSE, i * sizeof(Vector4));
-        }
-    }
-}
-
-void InstancedModels::render() const {
-
-    for (const auto& mesh : m_base.getMeshesRead()) {
-
-        const Material& material = mesh.getMaterial();
-
-        glBindVertexArray(mesh.getVAO());
-
-        if (material.diffuse)
-            glBindTextureUnit(0, material.diffuse->id);
-        if (material.specular)
-            glBindTextureUnit(1, material.specular->id);
-
-        glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
-    }
 }
 
 }; //namespace veil
