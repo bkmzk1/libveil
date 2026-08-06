@@ -67,7 +67,7 @@ class Instance : public IDrawable {
     private:
         const T& m_base;
         Matrix4 m_modelMatrix{1.0f};
-};
+}; //class Instance
 
 using ModelInstance = Instance<Model>;
 using MeshInstance = Instance<Mesh>;
