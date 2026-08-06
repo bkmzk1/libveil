@@ -45,12 +45,6 @@ find_package(glm    CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(veil   CONFIG REQUIRED)
 
-# Fetch the headers
-target_include_directories(main PRIVATE 
-    $<TARGET_PROPERTY:glad::glad,INTERFACE_INCLUDE_DIRECTORIES>
-    $<TARGET_PROPERTY:assimp::assimp,INTERFACE_INCLUDE_DIRECTORIES>
-)
-
 # Link against veil
 target_link_libraries(main 
     PRIVATE
@@ -61,6 +55,6 @@ target_link_libraries(main
 add_custom_command(TARGET main POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     $<TARGET_FILE:veil::veil>
-    $<TARGET_FILE_DIR:myapp>
+    $<TARGET_FILE_DIR:main>
 )
 ```
