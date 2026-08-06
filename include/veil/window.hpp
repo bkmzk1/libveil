@@ -84,12 +84,6 @@ class VEIL_EXPORT Window {
 
 }; //class Window
 
-inline void initOpenGLDriver(const Window* window) {
-    
-    if (!window)
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to initialize GLAD without a window"));
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to initialize GLAD")); 
-}
+VEIL_EXPORT void initOpenGLDriver(const Window* window);
 
 }; //namespace veil

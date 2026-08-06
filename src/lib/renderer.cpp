@@ -3,6 +3,12 @@
 
 namespace veil {
 
+void initRenderingFlags() {
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE); 
+}
+
 void Renderer::reserveShaders(const std::vector<const Shader*>& shaders) {
 
     for (const auto& shader : shaders) 

@@ -16,11 +16,7 @@
 
 namespace veil {
 
-constexpr inline void initRenderingFlags() {
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE); 
-}
+VEIL_EXPORT void initRenderingFlags();
 
 class VEIL_EXPORT Renderer {
     public:

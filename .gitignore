@@ -1,3 +1,4 @@
-/vcpkg-configuration.json
-/build
-/src/app
+vcpkg-configuration.json
+build
+src/app
+.vscode

@@ -1,8 +1,5 @@
-
 cmake_minimum_required(VERSION 3.31)
 
-#set...
-set(CMAKE_TOOLCHAIN_FILE "d:/VS/Product/VC/vcpkg/scripts/buildsystems/vcpkg.cmake")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -10,20 +7,26 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-project(main)
+set(VCPKG_TARGET_TRIPLET "x64-windows-static-md" CACHE STRING "")
 
-#include...
+cmake_policy(SET CMP0091 NEW)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+project(libveil VERSION 1.0.0 LANGUAGES CXX)
+
 include(GenerateExportHeader)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
-#find_package...
-find_package(glad CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
+find_package(glad   CONFIG REQUIRED)
+find_package(glfw3  CONFIG REQUIRED)
+find_package(glm    CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
-find_package(Stb REQUIRED)
+find_package(Stb    REQUIRED)
 
-#add_executable...
-add_library(veil SHARED
+add_library(
+    veil
+    SHARED
     src/lib/window.cpp
     src/lib/shader.cpp
     src/lib/glcamera.cpp
@@ -33,32 +36,67 @@ add_library(veil SHARED
     src/lib/renderer.cpp
     src/lib/drawable.cpp
 )
-add_executable(main #WIN32 
-    src/app/main.cpp
+
+target_compile_definitions(
+    veil
+    PRIVATE
+    VEIL_EXPORTS
 )
 
-#target_link_libraries...
-target_link_libraries(veil PUBLIC 
-    glad::glad 
+target_link_libraries(
+    veil
+    PUBLIC 
+    glad::glad
+    PRIVATE
     glfw
     glm::glm
     assimp::assimp
 )
-target_link_libraries(main PRIVATE
-    veil
-)
 
-generate_export_header(veil
+generate_export_header(
+    veil
     BASE_NAME veil
     EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/include/veil_export.h
 )
 
-#target_link_options(main PRIVATE 
-#    "/ENTRY:mainCRTStartup"
-#    "/SUBSYSTEM:WINDOWS"
-#)
-target_include_directories(veil PUBLIC 
-    include
-    ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${Stb_INCLUDE_DIR}
+target_include_directories(
+    veil
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<BUILD_INTERFACE:${Stb_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+install(
+    TARGETS veil
+    EXPORT veilTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(
+    DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/include/veil_export.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
+    EXPORT veilTargets
+    FILE veilTargets.cmake
+    NAMESPACE veil::
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/veil
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/veilConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/veilConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_DATADIR}/veil
+)
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/veilConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/veil
 )
