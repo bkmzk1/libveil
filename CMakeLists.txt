@@ -9,10 +9,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 set(VCPKG_TARGET_TRIPLET "x64-windows-static-md" CACHE STRING "")
 
-cmake_policy(SET CMP0091 NEW)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
-project(libveil VERSION 1.0.0 LANGUAGES CXX)
+project(libveil VERSION 1.0.3 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 include(GNUInstallDirs)
