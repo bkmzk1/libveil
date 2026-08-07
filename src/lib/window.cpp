@@ -31,9 +31,9 @@ Window::Window(std::string_view title, const Vector2& windowSize) {
     glfwSetWindowUserPointer(m_window, this);
 
     #ifdef _WIN32
-    veil::initOpenGLDriver(this); // WIN32 glad needs this macro to run explicitely in the .dll code
-                                  // or else glad function pointers will be 0x0
-                                  // THE CODE HAS NOT BEEN TESTED ON LINUX YET
+    VEIL_INIT_OPENGL_DRV // WIN32 glad needs this macro to run explicitely in the .dll code
+                         // or else glad function pointers will be 0x0
+                         // THE CODE HAS NOT BEEN TESTED ON LINUX YET
     #endif 
 
     glViewport(0, 0, windowSize.x, windowSize.y);
@@ -135,14 +135,6 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
     }
     else if (action == GLFW_RELEASE)
         win->m_keyEvents.keysDown[key] = false;
-}
-
-void initOpenGLDriver(const Window* window) {
-
-    if (!window)
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to initialize GLAD without a window"));
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to initialize GLAD"));
 }
 
 }; //namespace veil
