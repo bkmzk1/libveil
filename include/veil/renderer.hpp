@@ -39,20 +39,22 @@ class VEIL_EXPORT Renderer {
                     Log::message(LogType::CRITICAL, "No uniform '{}' found in program {}", uniformName, shader.getID())
                 );
 
-            if constexpr (std::is_invocable_v<std::decay_t<T>>)
-                m_uniformData[&shader].push_back({
-                    location, 
-                    [getter = std::forward<T>(v)](const Shader& shader, GLint location) {
-                        shader.setUniform(location, getter());
-                    }
-                });
-            else 
-                m_uniformData[&shader].push_back({
-                    location,
-                    [value = std::forward<T>(v)](const Shader& shader, GLint location) {
-                        shader.setUniform(location, value);
-                    }
-                });
+            if constexpr (std::is_invocable_v<std::decay_t<T>>) {
+
+                std::function<void(const Shader&, GLint)> setter =
+                [getter = std::forward<T>(v)](const Shader& shader, GLint location) {
+                    shader.setUniform(location, getter());
+                };
+                addUniformSetter(shader, location, std::move(setter));
+            }
+            else {
+
+                std::function<void(const Shader&, GLint)> setter =
+                [value = std::forward<T>(v)](const Shader& shader, GLint location) {
+                    shader.setUniform(location, value);
+                };
+                addUniformSetter(shader, location, std::move(setter));
+            }
         }
         template<typename T>
         void uploadUniformUniversal(std::string_view uniformName, T&& v) {
@@ -94,6 +96,8 @@ class VEIL_EXPORT Renderer {
         > m_uniformData;
 
         std::function<void(const Shader*, const IDrawable*)> m_forTargetFunc;
+
+        void addUniformSetter(const Shader& shader, GLint location, std::function<void(const Shader&, GLint)> setter);
 }; //class Renderer
 
 }; //namespace veil

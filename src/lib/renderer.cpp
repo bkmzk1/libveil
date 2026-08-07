@@ -90,4 +90,9 @@ void Renderer::callbackRender() const {
     }
 }
 
+void Renderer::addUniformSetter(const Shader& shader, GLint location, std::function<void(const Shader&, GLint)> setter) {
+
+    m_uniformData[&shader].push_back({location, std::move(setter)});
+}
+
 };
