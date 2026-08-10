@@ -2,3 +2,4 @@ vcpkg-configuration.json
 build
 src/app
 .vscode
+.cache

@@ -7,19 +7,22 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-set(VCPKG_TARGET_TRIPLET "x64-windows-static-md" CACHE STRING "")
-
-project(libveil VERSION 1.0.3 LANGUAGES CXX)
+project(libveil VERSION 1.1.0 LANGUAGES CXX C)
 
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-find_package(glad   CONFIG REQUIRED)
 find_package(glfw3  CONFIG REQUIRED)
 find_package(glm    CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
-find_package(Stb    REQUIRED)
+
+add_library(glad STATIC vendor/glad/src/glad.c)
+set_target_properties(glad PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(glad PUBLIC vendor/glad/include)
+
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE vendor/stb)
 
 add_library(
     veil
@@ -43,10 +46,11 @@ target_compile_definitions(
 target_link_libraries(
     veil
     PUBLIC 
-    glad::glad
-    PRIVATE
-    glfw
     glm::glm
+    PRIVATE
+    glad
+    stb
+    glfw
     assimp::assimp
 )
 
@@ -61,7 +65,6 @@ target_include_directories(
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${Stb_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -78,9 +81,18 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
+    DIRECTORY vendor/glad/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
+    DIRECTORY vendor/stb/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/include/veil_export.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
 install(
     EXPORT veilTargets
     FILE veilTargets.cmake

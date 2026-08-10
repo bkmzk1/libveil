@@ -30,11 +30,7 @@ Window::Window(std::string_view title, const Vector2& windowSize) {
     glfwMakeContextCurrent(m_window);
     glfwSetWindowUserPointer(m_window, this);
 
-    #ifdef _WIN32
-    VEIL_INIT_OPENGL_DRV // WIN32 glad needs this macro to run explicitely in the .dll code
-                         // or else glad function pointers will be 0x0
-                         // THE CODE HAS NOT BEEN TESTED ON LINUX YET
-    #endif 
+    VEIL_INIT_OPENGL_DRV
 
     glViewport(0, 0, windowSize.x, windowSize.y);
 }
