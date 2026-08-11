@@ -3,13 +3,10 @@
 
 #include <veil_export.h>
 
-#include <fstream>
 #include <initializer_list>
-#include <concepts>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "assets.hpp"
-#include "log.hpp"
 #include "math.hpp"
 
 namespace veil {

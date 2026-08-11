@@ -1,5 +1,8 @@
 
 #include <veil/window.hpp>
+#include <veil/log.hpp>
+
+#include <iostream>
 
 namespace veil {
 

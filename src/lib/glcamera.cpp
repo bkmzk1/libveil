@@ -1,6 +1,5 @@
 
 #include <veil/glcamera.hpp>
-
 namespace veil {
 
 GLCamera::GLCamera(const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg) {
@@ -41,7 +40,7 @@ void GLCamera::calculateAttitude(double xpos, double ypos) {
 
     m_yaw += static_cast<float>(xoff);
     m_pitch += static_cast<float>(yoff);
-    m_pitch = std::clamp(m_pitch, -89.0f, 89.0f);
+    m_pitch = glm::clamp(m_pitch, -89.0f, 89.0f);
 
     m_lastx = xpos;
     m_lasty = ypos;

@@ -2,17 +2,21 @@
 #include <veil/cache.hpp>
 #include <veil/model.hpp>
 #include <veil/drawable.hpp>
+#include <veil/log.hpp>
+
+#include <iostream>
+#include <fstream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 namespace veil {
 
-const Texture& TextureStorage::loadTexture(const std::string& path) {
+const Texture& TextureStorage::loadTexture(const std::filesystem::path& path) {
 
-    static Texture emptyTexture{0, "\0"};
+    static Texture emptyTexture{0, std::filesystem::path()};
 
-    if (path.empty() || path == "\0") {
+    if (path.empty() || path == std::filesystem::path()) {
 
         std::cout << Log::message(LogType::WARNING, "Tried to load a texture with no path") << std::endl;
         return emptyTexture;
@@ -39,17 +43,17 @@ void TextureStorage::shutdown() {
         m_cache.clear();
 }
 
-GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
+GLuint TextureStorage::loadTextureFromFile(const std::filesystem::path& path) const {
 
     stbi_set_flip_vertically_on_load(false);
 
     int width, height, channels;
-    unsigned char* data = stbi_load(path.data(), &width, &height, &channels, 0);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 
     if (!data) {
 
         stbi_image_free(data);
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load texture at {}", path));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load texture at {}", path.string()));
         return 0;
     }
 
@@ -86,7 +90,8 @@ GLuint TextureStorage::loadTextureFromFile(std::string_view path) const {
 
     return textureID;
 }
-ModelInstance ModelStorage::loadModel(const std::string& path) {
+
+ModelInstance ModelStorage::loadModel(const std::filesystem::path& path) {
     
     auto it = m_cache.find(path);
     if (it != m_cache.end())
@@ -95,22 +100,21 @@ ModelInstance ModelStorage::loadModel(const std::string& path) {
     m_cache.try_emplace(path, Model(path));
     return ModelInstance(this->instantiate(path));
 } 
-
-const Model& ModelStorage::getModel(const std::string& path) const {
+const Model& ModelStorage::getModel(const std::filesystem::path& path) const {
 
     auto it = m_cache.find(path);
 
     if (it == m_cache.end())
-        throw veil::Exception(Log::message(LogType::CRITICAL, "No existing model found '{}'", path));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "No existing model found '{}'", path.string()));
 
     return it->second;
 }
-ModelInstance ModelStorage::instantiate(const std::string& path) const {
+ModelInstance ModelStorage::instantiate(const std::filesystem::path& path) const {
 
     auto it = m_cache.find(path);
 
     if (it == m_cache.end())
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load model at {}", path));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load model at {}", path.string()));
 
     return ModelInstance(it->second);
 }
@@ -119,14 +123,14 @@ void ModelStorage::saveToBIN(const Model& model) const {
 
     const auto& meshes = model.getMeshesRead();
 
-    std::string localCacheDir = std::format("{}{}", model.getDirectory(), g_cacheDir);
+    std::filesystem::path localCacheDir = model.getDirectory() / g_cacheDir;
     std::filesystem::create_directories(localCacheDir);
 
-    std::string cacheFile = localCacheDir + g_cacheFile;
-
+    std::filesystem::path cacheFile = localCacheDir / g_cacheFile;
     std::ofstream out(cacheFile, std::ios::binary);
+
     if (!out.is_open())
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile.string()));
 
     size_t totalBytes = sizeof(size_t);
 
@@ -135,8 +139,8 @@ void ModelStorage::saveToBIN(const Model& model) const {
         const auto& mat = mesh.getMaterial();
 
         totalBytes += sizeof(BINCacheHeader);
-        totalBytes += mat.diffuse ? mat.diffuse->path.length() : 0;
-        totalBytes += mat.specular ? mat.specular->path.length() : 0;
+        totalBytes += mat.diffuse ? mat.diffuse->path.string().length() : 0;
+        totalBytes += mat.specular ? mat.specular->path.string().length() : 0;
         totalBytes += mesh.getVertices().size() * sizeof(Vertex);
         totalBytes += mesh.getIndices().size() * sizeof(unsigned int);
     }
@@ -153,22 +157,22 @@ void ModelStorage::saveToBIN(const Model& model) const {
     for (const auto& mesh : meshes) {
 
         const auto& mat = mesh.getMaterial();
-        const auto& diffPath = mat.diffuse ? mat.diffuse->path : "";
-        const auto& specPath = mat.specular ? mat.specular->path : "";
+        const auto& diffPath = mat.diffuse ? mat.diffuse->path : std::filesystem::path();
+        const auto& specPath = mat.specular ? mat.specular->path : std::filesystem::path();
 
-        header.diffLen = diffPath.length();
-        header.specLen = specPath.length();
+        header.diffLen = diffPath.string().length();
+        header.specLen = specPath.string().length();
         header.vertCount = mesh.getVertices().size();
         header.indCount  = mesh.getIndices().size();
         std::memcpy(bufferPtr, &header, sizeof(header));
         bufferPtr += sizeof(header);
 
         if (header.diffLen > 0) {
-            std::memcpy(bufferPtr, diffPath.data(), header.diffLen);
+            std::memcpy(bufferPtr, diffPath.c_str(), header.diffLen);
             bufferPtr += header.diffLen;
         }
         if (header.specLen > 0) {
-            std::memcpy(bufferPtr, specPath.data(), header.specLen);
+            std::memcpy(bufferPtr, specPath.c_str(), header.specLen);
             bufferPtr += header.specLen;
         }
 
@@ -188,11 +192,11 @@ void ModelStorage::loadFromBIN(Model& model) {
 
     auto& meshes = model.getMeshesWrite();
 
-    std::string cacheFile = std::format("{}{}{}", model.getDirectory(), g_cacheDir, g_cacheFile);
+    std::filesystem::path cacheFile = model.getDirectory() / g_cacheDir / g_cacheFile;
 
     std::ifstream in(cacheFile, std::ios::binary | std::ios::ate);
     if (!in.is_open()) 
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Unable to open {}", cacheFile.string()));
 
     std::streamsize fileSize = in.tellg();
     in.seekg(0, std::ios::beg);
@@ -208,11 +212,11 @@ void ModelStorage::loadFromBIN(Model& model) {
 
     meshes.reserve(meshNum);
 
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    BINCacheHeader header;
-
     for (size_t i = 0; i < meshNum; ++i) {
+
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+        BINCacheHeader header;
 
         std::memcpy(&header, bufferPtr, sizeof(header));
         bufferPtr += sizeof(header);
@@ -245,6 +249,13 @@ void ModelStorage::loadFromBIN(Model& model) {
 
         meshes.emplace_back(std::move(vertices), std::move(indices), material);
     }
+}
+
+ModelStorage::~ModelStorage() {
+    m_cache.clear();
+}
+void ModelStorage::shutdown() {
+    m_cache.clear();
 }
 
 }; //namespace veil

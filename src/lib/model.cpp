@@ -1,5 +1,6 @@
 
 #include <veil/model.hpp>
+#include <veil/log.hpp>
 
 namespace veil {
 
@@ -88,12 +89,12 @@ void Mesh::render() const {
 }
 
 
-Model::Model(std::string_view path) {
+Model::Model(const std::filesystem::path& path) {
 
-    LogTimer lt(path);
+    LogTimer lt(path.string());
 
-    m_directory = std::filesystem::path(path).parent_path().string();
-    std::string cacheFile = m_directory + g_cacheDir + g_cacheFile;
+    m_directory = path.parent_path();
+    std::string cacheFile = m_directory / g_cacheDir / g_cacheFile;
 
     if (std::filesystem::exists(cacheFile)) 
         ModelStorage::getInstance().loadFromBIN(*this);
@@ -107,11 +108,11 @@ void Model::render() const {
         mesh.render();
 }
 
-void Model::loadModel(std::string_view path) {
+void Model::loadModel(const std::filesystem::path& path) {
 
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(
-        path.data(), 
+        path.c_str(), 
         aiProcess_Triangulate | 
         aiProcess_FlipUVs | 
         aiProcess_GenSmoothNormals |
@@ -188,12 +189,12 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         if (aiMat->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
             aiString relativePath;
             aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &relativePath);
-            material.diffuse = &TextureStorage::getInstance().loadTexture(m_directory + '/' + relativePath.C_Str());
+            material.diffuse = &TextureStorage::getInstance().loadTexture(m_directory / relativePath.C_Str());
         }
         if (aiMat->GetTextureCount(aiTextureType_SPECULAR) > 0) {
             aiString relativePath;
             aiMat->GetTexture(aiTextureType_SPECULAR, 0, &relativePath);
-            material.specular = &TextureStorage::getInstance().loadTexture(m_directory + '/' + relativePath.C_Str());
+            material.specular = &TextureStorage::getInstance().loadTexture(m_directory / + relativePath.C_Str());
         }
     }
 

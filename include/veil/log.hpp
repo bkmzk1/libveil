@@ -4,7 +4,6 @@
 #include <veil_export.h>
 
 #include <chrono>
-#include <iostream>
 #include <format>
 #include <source_location>
 #include <stdexcept>

@@ -3,15 +3,12 @@
 
 #include <veil_export.h>
 
-#include <string>
 #include <functional>
 #include <string_view>
-#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "log.hpp"
-#include "assets.hpp"
+#include "math.hpp"
 
 namespace veil {
 

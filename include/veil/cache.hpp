@@ -4,16 +4,14 @@
 #include <veil_export.h>
 
 #include <unordered_map>
-#include <string_view>
+#include <filesystem>
 
 #include "assets.hpp"
-#include "log.hpp"
 
 namespace veil {
 
-//FIXME: Use filesystem not string concat
-constexpr const char g_cacheFile[11] = "/cache.bin";
-constexpr const char g_cacheDir[8]  = "/.cache";
+inline const std::filesystem::path g_cacheFile = "cache.bin";
+inline const std::filesystem::path g_cacheDir  = ".cache";
 
 class Model;
 
@@ -38,12 +36,12 @@ class VEIL_EXPORT TextureStorage : public util::Singleton<TextureStorage> {
     public:
         ~TextureStorage(); 
         void shutdown();
-        const Texture& loadTexture(const std::string& path);
+        const Texture& loadTexture(const std::filesystem::path& path);
         
     private:
         TextureStorage() = default;
-        std::unordered_map<std::string, Texture> m_cache;
-        GLuint loadTextureFromFile(std::string_view path) const;
+        std::unordered_map<std::filesystem::path, Texture> m_cache;
+        GLuint loadTextureFromFile(const std::filesystem::path& path) const;
 }; //class TextureStorage
 
 class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
@@ -51,19 +49,20 @@ class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
     friend class util::Singleton<ModelStorage>;
 
     public:
-        ~ModelStorage() = default;
+        ~ModelStorage();
+        void shutdown();
 
-        ModelInstance instantiate(const std::string& path) const;
-        ModelInstance loadModel(const std::string& path);
+        ModelInstance instantiate(const std::filesystem::path& path) const;
+        ModelInstance loadModel(const std::filesystem::path& path);
 
         void saveToBIN(const Model& model) const;
         void loadFromBIN(Model& model);
 
-        const Model& getModel(const std::string& path) const;
+        const Model& getModel(const std::filesystem::path& path) const;
 
     private:
         ModelStorage() = default;
-        std::unordered_map<std::string, Model> m_cache;
+        std::unordered_map<std::filesystem::path, Model> m_cache;
 }; //class ModelStorage
 
 }; //namespace veil

@@ -3,7 +3,7 @@
 
 #include <veil_export.h>
 
-#include <string>
+#include <filesystem>
 #include <glad/glad.h>
 
 #include "math.hpp"
@@ -20,7 +20,7 @@ struct VEIL_EXPORT Vertex {
 struct VEIL_EXPORT Texture {
 
     Texture() = default;
-    Texture(GLuint texID, std::string_view texPath) : id(texID), path(texPath) {}
+    Texture(GLuint texID, const std::filesystem::path& texPath) : id(texID), path(texPath) {}
 
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
@@ -34,8 +34,10 @@ struct VEIL_EXPORT Texture {
     Texture& operator=(Texture&& other) {
 
         if (this != &other) {
+
             if (id) 
                 glDeleteTextures(1, &id);
+
             path = std::move(other.path);
             id = other.id;
             other.id = 0;
@@ -49,7 +51,7 @@ struct VEIL_EXPORT Texture {
     }
 
     GLuint id = 0;
-    std::string path = "\0";
+    std::filesystem::path path;
 
 }; //struct Texture
 

@@ -3,10 +3,8 @@
 
 #include <veil_export.h>
 
-#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "window.hpp"
 #include "math.hpp"
 
 namespace veil {

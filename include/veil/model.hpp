@@ -4,7 +4,6 @@
 #include <veil_export.h>
 
 #include <vector>
-#include <fstream>
 #include <filesystem>
 #include <span>
 
@@ -13,10 +12,7 @@
 #include <assimp/postprocess.h>
 
 #include "assets.hpp"
-#include "shader.hpp"
 #include "cache.hpp"
-#include "log.hpp"
-#include "math.hpp"
 
 namespace veil {
 
@@ -51,7 +47,7 @@ class VEIL_EXPORT Mesh {
 class VEIL_EXPORT Model {
     public:
         Model() = delete;
-        explicit Model(std::string_view path);
+        explicit Model(const std::filesystem::path& path);
 
         Model(const Model&) = delete;
         Model& operator=(const Model&) = delete;
@@ -61,15 +57,15 @@ class VEIL_EXPORT Model {
         
         void render() const; 
 
-        inline std::string_view getDirectory() const { return m_directory; }
+        inline const std::filesystem::path& getDirectory() const { return m_directory; }
         inline std::span<const Mesh> getMeshesRead() const { return m_meshes; }
         inline std::vector<Mesh>& getMeshesWrite() { return m_meshes; }
         
     private:
         std::vector<Mesh> m_meshes;
-        std::string m_directory;
+        std::filesystem::path m_directory;
 
-        void loadModel(std::string_view path);
+        void loadModel(const std::filesystem::path& path);
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 }; //class Model

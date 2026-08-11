@@ -1,5 +1,6 @@
 
 #include <veil/drawable.hpp>
+#include <veil/log.hpp>
 
 namespace veil {
 

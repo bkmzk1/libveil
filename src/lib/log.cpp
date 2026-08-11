@@ -1,6 +1,8 @@
 
 #include <veil/log.hpp>
 
+#include <iostream>
+
 namespace veil {
 
 LogTimer::LogTimer(std::string_view name, std::source_location loc) {

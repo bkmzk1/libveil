@@ -17,28 +17,15 @@ struct Vector : glm::vec<N, float> {
     inline Vector() : Base() {}
     inline Vector(const Base& v) : Base(v) {}
 
-    Vector& operator+=(const Vector& r) {
-
-        Base::operator+=(static_cast<const Base&>(r));
-        return *this;
-    }
-    Vector& operator-=(const Vector& r) {
-
-        Base::operator-=(static_cast<const Base&>(r));
-        return *this;
-    }
-    friend Vector operator+(Vector l, const Vector& r) {
-        l += r;
-        return l;
-    }
-    friend Vector operator-(Vector l, const Vector& r) {
-        l -= r;
-        return l;
-    }
+    Vector& operator+=(const Vector& r) { Base::operator+=(static_cast<const Base&>(r)); return *this; }
+    Vector& operator-=(const Vector& r) { Base::operator-=(static_cast<const Base&>(r)); return *this; }
+    friend Vector operator+(Vector l, const Vector& r) { l += r; return l; }
+    friend Vector operator-(Vector l, const Vector& r) { l -= r; return l; }
 
     Vector normalized() const { 
         return Vector(glm::normalize(static_cast<Base>(*this))); 
     }
+    
     static Vector cross(const Vector& a, const Vector& b) {
         return Vector(glm::cross(static_cast<Base>(a), static_cast<Base>(b)));
     }
