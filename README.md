@@ -13,9 +13,16 @@
 
 #### Prerequisites
 - CMake
+
+#### Dependencies
 - GLFW3
 - GLM
 - Assimp
+
+```bash
+# Installing dependencies on Fedora 44
+sudo dnf install glfw glfw-devel glm-devel assimp assimp-devel
+```
 
 #### Compilation steps
 Execute the following commands from the project root directory:
@@ -31,9 +38,10 @@ cmake --install build
 ```
 
 ### Integration and usage
-Once installed, you can consume the library in downstream projects via CMake's `find_package` architecture. The snippet below demonstrates how to link the library and propagate its dependency graph.
+Once installed, you can consume the library in downstream projects via CMake's `find_package` architecture. The snippet below demonstrates it:
 
 ```cmake
+# Locate veil package
 find_package(veil CONFIG REQUIRED)
 
 # Link against veil
