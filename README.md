@@ -19,14 +19,14 @@
 - GLM
 - Assimp
 
-```bash
+```sh
 # Installing dependencies on Fedora 44
 sudo dnf install glfw glfw-devel glm-devel assimp assimp-devel
 ```
 
 #### Compilation steps
 Execute the following commands from the project root directory:
-```bash
+```sh
 # Generate the build configuration
 cmake -B build -S . 
 
