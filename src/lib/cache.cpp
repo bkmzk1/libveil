@@ -91,15 +91,28 @@ GLuint TextureStorage::loadTextureFromFile(const std::filesystem::path& path) co
     return textureID;
 }
 
-ModelInstance ModelStorage::loadModel(const std::filesystem::path& path) {
+void ModelStorage::loadModel(const std::filesystem::path& path) {
+
+    LogTimer log(path.string());
     
     auto it = m_cache.find(path);
     if (it != m_cache.end())
-        return ModelInstance(this->instantiate(path));
+        return;
     
-    m_cache.try_emplace(path, Model(path));
-    return ModelInstance(this->instantiate(path));
+    auto [insertedIt, inserted] = m_cache.try_emplace(path);
+    Model& model = insertedIt->second;
+    model.setDirectory(path.parent_path());
+
+    std::filesystem::path cacheFile = path.parent_path() / g_cacheDir / g_cacheFile;
+
+    if (std::filesystem::exists(cacheFile)) 
+        loadFromBIN(model);
+    else {
+        model.loadModel(path);
+        saveToBIN(model);
+    }
 } 
+
 const Model& ModelStorage::getModel(const std::filesystem::path& path) const {
 
     auto it = m_cache.find(path);

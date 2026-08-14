@@ -1,6 +1,7 @@
 
 #include <veil/model.hpp>
 #include <veil/log.hpp>
+#include <veil/cache.hpp>
 
 namespace veil {
 
@@ -91,15 +92,8 @@ void Mesh::render() const {
 
 Model::Model(const std::filesystem::path& path) {
 
-    LogTimer lt(path.string());
-
     m_directory = path.parent_path();
-    std::string cacheFile = m_directory / g_cacheDir / g_cacheFile;
-
-    if (std::filesystem::exists(cacheFile)) 
-        ModelStorage::getInstance().loadFromBIN(*this);
-    else
-        loadModel(path);
+    loadModel(path);
 }
 
 void Model::render() const {
@@ -125,8 +119,6 @@ void Model::loadModel(const std::filesystem::path& path) {
     }
 
     processNode(scene->mRootNode, scene);
-
-    ModelStorage::getInstance().saveToBIN(*this);
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene) {
@@ -194,7 +186,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         if (aiMat->GetTextureCount(aiTextureType_SPECULAR) > 0) {
             aiString relativePath;
             aiMat->GetTexture(aiTextureType_SPECULAR, 0, &relativePath);
-            material.specular = &TextureStorage::getInstance().loadTexture(m_directory / + relativePath.C_Str());
+            material.specular = &TextureStorage::getInstance().loadTexture(m_directory / relativePath.C_Str());
         }
     }
 

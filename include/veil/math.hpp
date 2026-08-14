@@ -55,15 +55,9 @@ struct Matrix : glm::mat<C, R, float, glm::packed_highp> {
         *this = glm::lookAt(camPos, camCenter, camUp);
     }
 
-    void translate(const Vector3& transv) {
-        *this = glm::translate(*this, transv);
-    }
-    void rotate(float angleDeg, const Vector3& rotv) {
-        *this = glm::rotate(*this, glm::radians(angleDeg), rotv);
-    }
-    void scale(const Vector3& scalev) {
-        *this = glm::scale(*this, scalev);
-    }
+    void translate(const Vector3& transv)            { *this = glm::translate(*this, transv); }
+    void rotate(float angleDeg, const Vector3& rotv) { *this = glm::rotate(*this, glm::radians(angleDeg), rotv); }
+    void scale(const Vector3& scalev)                { *this = glm::scale(*this, scalev); }
 };
 using Matrix3 = Matrix<3, 3>;
 using Matrix4 = Matrix<4, 4>;

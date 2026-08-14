@@ -7,18 +7,13 @@
 #include <filesystem>
 
 #include "assets.hpp"
+#include "model.hpp"
+#include "drawable.hpp"
 
 namespace veil {
 
 inline const std::filesystem::path g_cacheFile = "cache.bin";
 inline const std::filesystem::path g_cacheDir  = ".cache";
-
-class Model;
-
-template<typename T>
-class Instance;
-
-using ModelInstance = Instance<Model>;
 
 struct BINCacheHeader {
 
@@ -53,7 +48,7 @@ class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
         void shutdown();
 
         ModelInstance instantiate(const std::filesystem::path& path) const;
-        ModelInstance loadModel(const std::filesystem::path& path);
+        void loadModel(const std::filesystem::path& path);
 
         void saveToBIN(const Model& model) const;
         void loadFromBIN(Model& model);

@@ -12,7 +12,6 @@
 #include <assimp/postprocess.h>
 
 #include "assets.hpp"
-#include "cache.hpp"
 
 namespace veil {
 
@@ -46,7 +45,7 @@ class VEIL_EXPORT Mesh {
 
 class VEIL_EXPORT Model {
     public:
-        Model() = delete;
+        Model() = default;
         explicit Model(const std::filesystem::path& path);
 
         Model(const Model&) = delete;
@@ -54,8 +53,11 @@ class VEIL_EXPORT Model {
 
         Model(Model&&) noexcept = default;
         Model& operator=(Model&&) noexcept = default;
+
+        inline void setDirectory(const std::filesystem::path& path) { m_directory = path; }
         
         void render() const; 
+        void loadModel(const std::filesystem::path& path);
 
         inline const std::filesystem::path& getDirectory() const { return m_directory; }
         inline std::span<const Mesh> getMeshesRead() const { return m_meshes; }
@@ -65,7 +67,6 @@ class VEIL_EXPORT Model {
         std::vector<Mesh> m_meshes;
         std::filesystem::path m_directory;
 
-        void loadModel(const std::filesystem::path& path);
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 }; //class Model
