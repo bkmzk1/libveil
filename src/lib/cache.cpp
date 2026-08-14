@@ -14,6 +14,8 @@ namespace veil {
 
 const Texture& TextureStorage::loadTexture(const std::filesystem::path& path) {
 
+    LogTimer lt(path.string());
+
     static Texture emptyTexture{0, std::filesystem::path()};
 
     if (path.empty() || path == std::filesystem::path()) {
@@ -26,7 +28,7 @@ const Texture& TextureStorage::loadTexture(const std::filesystem::path& path) {
     if (cacheIt != m_cache.end())
         return cacheIt->second;
 
-    GLuint textureID = loadTextureFromFile(path);
+    GLuint textureID = TextureStorage::loadTextureFromFile(path);
 
     auto [insertedIt, success] = m_cache.try_emplace(path, textureID, path);
     return insertedIt->second;
@@ -43,7 +45,7 @@ void TextureStorage::shutdown() {
         m_cache.clear();
 }
 
-GLuint TextureStorage::loadTextureFromFile(const std::filesystem::path& path) const {
+GLuint TextureStorage::loadTextureFromFile(const std::filesystem::path& path) {
 
     stbi_set_flip_vertically_on_load(false);
 
@@ -200,7 +202,6 @@ void ModelStorage::saveToBIN(const Model& model) const {
 
     out.write(fileBuffer.data(), totalBytes);
 }
-
 void ModelStorage::loadFromBIN(Model& model) {
 
     auto& meshes = model.getMeshesWrite();
@@ -269,6 +270,40 @@ ModelStorage::~ModelStorage() {
 }
 void ModelStorage::shutdown() {
     m_cache.clear();
+}
+
+ShaderStorage::~ShaderStorage() {
+    m_cache.clear();
+}
+void ShaderStorage::shutdown() {
+    m_cache.clear();
+}
+
+void ShaderStorage::loadShader(
+                    const std::string& name, 
+                    std::initializer_list<std::pair<std::string_view, GLenum>> sources)
+{
+
+    LogTimer lt(name);
+
+    auto it = m_cache.find(name);
+    if (it != m_cache.end())
+        return;
+
+    auto [insertedIt, success] = m_cache.try_emplace(name, sources);
+}
+
+const Shader* ShaderStorage::getShader(const std::string& name) const {
+
+    auto it = m_cache.find(name);
+
+    if (it == m_cache.end()) {
+
+        std::cout << Log::message(LogType::WARNING, "Unable to find shader '{}'", name) << std::endl;
+        return nullptr;
+    }
+    
+    return &it->second;
 }
 
 }; //namespace veil

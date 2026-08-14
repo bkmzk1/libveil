@@ -21,8 +21,6 @@ static std::string readFile(const std::string& filename) {
 
 Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> sources) {
 
-    LogTimer shader("shader");
-
     if (sources.size() == 0)
         throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to create an empty shader"));
 
@@ -102,7 +100,7 @@ Shader& Shader::operator=(Shader&& other) noexcept {
 
     if (this != &other) {
 
-        glDeleteProgram(other.m_shaderProgram);
+        glDeleteProgram(m_shaderProgram);
 
         m_shaderProgram = other.m_shaderProgram;
 

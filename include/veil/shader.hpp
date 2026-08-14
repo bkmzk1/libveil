@@ -13,7 +13,7 @@ namespace veil {
 
 class VEIL_EXPORT Shader {
     public:
-        Shader() = delete;
+        Shader() = default;
         Shader(std::initializer_list<std::pair<std::string_view, GLenum>> sources);
 
         Shader(const Shader&) = delete;
@@ -36,7 +36,7 @@ class VEIL_EXPORT Shader {
         inline GLuint getID() const { return m_shaderProgram; }
 
     private:
-        GLuint m_shaderProgram;
+        GLuint m_shaderProgram = 0;
 }; //class Shader
 
 }; //namespace veil

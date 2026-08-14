@@ -36,7 +36,7 @@ class VEIL_EXPORT TextureStorage : public util::Singleton<TextureStorage> {
     private:
         TextureStorage() = default;
         std::unordered_map<std::filesystem::path, Texture> m_cache;
-        GLuint loadTextureFromFile(const std::filesystem::path& path) const;
+        static GLuint loadTextureFromFile(const std::filesystem::path& path);
 }; //class TextureStorage
 
 class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
@@ -59,5 +59,22 @@ class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
         ModelStorage() = default;
         std::unordered_map<std::filesystem::path, Model> m_cache;
 }; //class ModelStorage
+
+class VEIL_EXPORT ShaderStorage : public util::Singleton<ShaderStorage> {
+
+    friend class util::Singleton<ShaderStorage>;
+
+    public:
+        ~ShaderStorage();
+        void shutdown();
+
+        void loadShader(const std::string& name, std::initializer_list<std::pair<std::string_view, GLenum>> sources);
+
+        const Shader* getShader(const std::string& name) const;
+
+    private:
+        ShaderStorage() = default;
+        std::unordered_map<std::string, Shader> m_cache;
+}; //class ShaderStorage
 
 }; //namespace veil

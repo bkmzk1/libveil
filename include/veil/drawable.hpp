@@ -19,6 +19,7 @@ enum class DrawableType : uint8_t {
 
 template <typename T>
 struct DrawableTraits {
+    static constexpr DrawableType type = DrawableType::UNKNOWN;
 };
 template <>
 struct DrawableTraits<Model> {
