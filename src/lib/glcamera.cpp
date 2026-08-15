@@ -65,4 +65,14 @@ void GLCamera::move(const Vector3& factor) {
     m_viewDirty = true;
 }
 
+const GLCamera::Attitude& GLCamera::getAttitude() {
+
+    if (m_viewDirty) {
+
+        m_viewDirty = false;
+        updateView();
+    }
+    return m_attitude;
+}
+
 }; //namespace veil

@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <functional>
 #include <string_view>
+
 #include <glad/glad.h>
 
 #include "shader.hpp"
@@ -17,6 +18,15 @@
 namespace veil {
 
 VEIL_EXPORT void initRenderingFlags();
+
+template<typename T>
+static auto toProvider(T&& v) {
+    
+    if constexpr (std::is_invocable_v<std::decay_t<T>>) 
+        return std::forward<T>(v);
+    else
+        return [value = std::forward<T>(v)] { return value; };
+}   
 
 class VEIL_EXPORT Renderer {
     public:
@@ -29,6 +39,12 @@ class VEIL_EXPORT Renderer {
         void addTargets(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets);
         void changeTargetShader(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets);
 
+        template<typename... Args>
+        void uploadUniformBuffers(Args&&... targets) {
+
+            (addUniformBufferSetter(std::forward<Args>(targets)), ...);
+        }
+
         template<typename T> 
         void uploadUniform(const ShaderProgram& shader, std::string_view uniformName, T&& v) {
             
@@ -39,30 +55,21 @@ class VEIL_EXPORT Renderer {
                     Log::message(LogType::CRITICAL, "No uniform '{}' found in program {}", uniformName, shader.getID())
                 );
 
-            if constexpr (std::is_invocable_v<std::decay_t<T>>) {
+            auto provider = toProvider(std::forward<T>(v));
 
-                std::function<void(const ShaderProgram&, GLint)> setter =
-                [getter = std::forward<T>(v)](const ShaderProgram& shader, GLint location) {
-                    shader.setUniform(location, getter());
+            std::function<void(const ShaderProgram&, GLint)> setter =
+                [provider](const ShaderProgram& shader, GLint location) {
+                    shader.setUniform(location, provider());
                 };
-                addUniformSetter(shader, location, std::move(setter));
-            }
-            else {
-
-                std::function<void(const ShaderProgram&, GLint)> setter =
-                [value = std::forward<T>(v)](const ShaderProgram& shader, GLint location) {
-                    shader.setUniform(location, value);
-                };
-                addUniformSetter(shader, location, std::move(setter));
-            }
+            addUniformSetter(shader, location, std::move(setter));
         }
         template<typename T>
-        void uploadUniformUniversal(std::string_view uniformName, T&& v) {
+        void uploadUniformUniversal(std::string_view uniformName, const T& v) {
 
             for (const auto& data : m_renderData) {
                 
                 data.first->useProgram();
-                uploadUniform(*data.first, uniformName, std::move(v));
+                uploadUniform(*data.first, uniformName, v);
             }
         }
         template<typename T>
@@ -95,9 +102,25 @@ class VEIL_EXPORT Renderer {
             std::vector<std::pair<GLint, std::function<void(const ShaderProgram&, GLint)> > >
         > m_uniformData;
 
+        std::unordered_map<
+            const UniformBuffer*,
+            std::function<void(const UniformBuffer&)>
+        > m_uniformBufferData;
+
         std::function<void(const ShaderProgram*, const IDrawable*)> m_forTargetFunc;
 
-        void addUniformSetter(const ShaderProgram& shader, GLint loc,std::function<void(const ShaderProgram&, GLint)> setter);
+        template<typename T>
+        void addUniformBufferSetter(std::pair<const UniformBuffer&, T>&& target) {
+
+            auto provider = toProvider(std::forward<T>(target.second));
+
+            std::function<void(const UniformBuffer&)> setter =
+                [provider](const UniformBuffer& ubo) {
+                    ubo.setValue(provider());
+                };
+            m_uniformBufferData.try_emplace(&target.first, std::move(setter));
+        }
+        void addUniformSetter(const ShaderProgram& shader,GLint loc,std::function<void(const ShaderProgram&, GLint)> setter);
 }; //class Renderer
 
 }; //namespace veil

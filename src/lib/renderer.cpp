@@ -56,15 +56,23 @@ void Renderer::setForTargetCallback(std::function<void(const ShaderProgram*, con
 
 void Renderer::callbackUniforms() const {
 
-    if (m_uniformData.empty())
-        return;
+    if (!m_uniformBufferData.empty()) {
 
-    for (const auto& [shader, uniforms] : m_uniformData) {
+        for (const auto& [ubo, setter] : m_uniformBufferData) {
 
-        shader->useProgram();
+            setter(*ubo);
+        }
+    }
 
-        for (const auto& [location, setter] : uniforms)
-            setter(*shader, location);
+    if (!m_uniformData.empty()) {
+
+        for (const auto& [shader, uniforms] : m_uniformData) {
+
+            shader->useProgram();
+
+            for (const auto& [location, setter] : uniforms)
+                setter(*shader, location);
+        }
     }
 }
 

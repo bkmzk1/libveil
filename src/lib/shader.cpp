@@ -93,14 +93,17 @@ ShaderProgram::ShaderProgram(std::initializer_list<std::pair<std::string_view, G
 }
 ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept {
 
+    if (m_shaderID) glDeleteProgram(m_shaderID);
+
     m_shaderID = other.m_shaderID;
-    other.m_shaderID = 0;
+
+    other.m_shaderID = 0;    
 }
 ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
 
     if (this != &other) {
 
-        glDeleteProgram(m_shaderID);
+        if (m_shaderID) glDeleteProgram(m_shaderID);
 
         m_shaderID = other.m_shaderID;
 
@@ -110,7 +113,7 @@ ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
 }
 ShaderProgram::~ShaderProgram() {
 
-    glDeleteProgram(m_shaderID);
+    if (m_shaderID) glDeleteProgram(m_shaderID);
 }
 
 void ShaderProgram::setUniform(int location, float x, float y, float z) const {
@@ -130,6 +133,29 @@ void ShaderProgram::setUniform(int location, const Vector2& vec) const {
 }
 void ShaderProgram::setUniform(int location, const Matrix4& mat) const {
     glProgramUniformMatrix4fv(m_shaderID, location, 1, GL_FALSE, glm::value_ptr(static_cast<Matrix4::Base>(mat)));
+}
+
+UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept {
+
+    if (m_ubo) glDeleteBuffers(1, &m_ubo);
+
+    m_ubo = other.m_ubo;
+    other.m_ubo = 0;
+}
+UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept {
+
+    if (this != &other) {
+
+        if (m_ubo) glDeleteBuffers(1, &m_ubo);
+
+        m_ubo = other.m_ubo;
+        other.m_ubo = 0;
+    }   
+    return *this;
+}
+UniformBuffer::~UniformBuffer() {
+
+    if (m_ubo) glDeleteBuffers(1, &m_ubo);
 }
 
 } //namespace veil

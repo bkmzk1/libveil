@@ -4,10 +4,14 @@
 #include <veil_export.h>
 
 #include <initializer_list>
+#include <utility>
+#include <type_traits>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include "assets.hpp"
 #include "math.hpp"
+#include "log.hpp"
 
 namespace veil {
 
@@ -38,5 +42,48 @@ class VEIL_EXPORT ShaderProgram {
     private:
         GLuint m_shaderID = 0;
 }; //class ShaderProgram
+
+class UniformBuffer {
+    public:
+        UniformBuffer() = default;
+
+        template<typename T>
+        UniformBuffer(unsigned int location, std::type_identity<T>) : m_size(sizeof(T)) {
+
+            GLuint ubo;
+            glCreateBuffers(1, &ubo);
+            glNamedBufferStorage(ubo, sizeof(T), nullptr, GL_DYNAMIC_STORAGE_BIT);
+            glBindBufferBase(GL_UNIFORM_BUFFER, location, ubo);
+
+            m_ubo = ubo;
+            m_location = location;
+        }
+
+        UniformBuffer(const UniformBuffer&) = delete;
+        UniformBuffer& operator=(const UniformBuffer&) = delete;
+
+        UniformBuffer(UniformBuffer&&) noexcept;
+        UniformBuffer& operator=(UniformBuffer&&) noexcept;
+
+        ~UniformBuffer();
+
+        template<typename T>
+        void setValue(const T& value) const {
+
+            if (m_size != sizeof(value))
+                throw veil::Exception(Log::message(LogType::CRITICAL, "Buffer size '{}' does not match value size '{}'", 
+                                      m_size, sizeof(value)));
+
+            glNamedBufferSubData(m_ubo, 0, sizeof(value), &value);
+        }
+
+        inline GLuint getID() { return m_ubo; }
+        inline unsigned int getLocation() { return m_location; }
+
+    private:
+        GLuint m_ubo = 0;
+        unsigned int m_location = 0;
+        const GLint64 m_size = 0;
+}; //class UniformBuffer
 
 }; //namespace veil
