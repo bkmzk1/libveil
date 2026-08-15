@@ -67,6 +67,7 @@ class UniformBuffer {
 
         ~UniformBuffer();
 
+        //FIXME: Catch the type error, not the size error 
         template<typename T>
         void setValue(const T& value) const {
 
