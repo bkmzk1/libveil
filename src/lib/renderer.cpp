@@ -1,5 +1,5 @@
 
-#include "veil/renderer.hpp"
+#include "../../include/veil/renderer.hpp"
 
 namespace veil {
 
@@ -9,30 +9,30 @@ void initRenderingFlags() {
     glEnable(GL_CULL_FACE); 
 }
 
-void Renderer::reserveShaders(const std::vector<const Shader*>& shaders) {
+void Renderer::reserveShaders(const std::vector<const ShaderProgram*>& shaders) {
 
     for (const auto& shader : shaders) 
         m_renderData.try_emplace(shader, 0);
 }
 
-void Renderer::addTargets(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
+void Renderer::addTargets(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
-        const Shader* shader = &target.first;
+        const ShaderProgram* shader = &target.first;
         const IDrawable* drawable = &target.second;
 
         m_renderData[shader].push_back(drawable);
         drawable->setCurrentShader(shader);
     }
 }
-void Renderer::changeTargetShader(std::initializer_list<std::pair<const Shader&, const IDrawable&>> targets) {
+void Renderer::changeTargetShader(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets) {
 
     for (const auto& target : targets) {
 
         const IDrawable* drawable = &target.second;
-        const Shader* newShader = &target.first;
-        const Shader* oldShader = drawable->getCurrentShader();
+        const ShaderProgram* newShader = &target.first;
+        const ShaderProgram* oldShader = drawable->getCurrentShader();
 
         if (newShader && newShader != oldShader) {
             
@@ -49,7 +49,7 @@ void Renderer::changeTargetShader(std::initializer_list<std::pair<const Shader&,
     }
 }
 
-void Renderer::setForTargetCallback(std::function<void(const Shader*, const IDrawable*)>&& forModelFunc) {
+void Renderer::setForTargetCallback(std::function<void(const ShaderProgram*, const IDrawable*)>&& forModelFunc) {
 
     m_forTargetFunc = std::move(forModelFunc);
 }
@@ -90,8 +90,11 @@ void Renderer::callbackRender() const {
     }
 }
 
-void Renderer::addUniformSetter(const Shader& shader, GLint location, std::function<void(const Shader&, GLint)> setter) {
-
+void Renderer::addUniformSetter(
+                    const ShaderProgram& shader, 
+                    GLint location, 
+                    std::function<void(const ShaderProgram&, GLint)> setter) 
+{
     m_uniformData[&shader].push_back({location, std::move(setter)});
 }
 

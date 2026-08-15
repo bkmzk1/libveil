@@ -1,8 +1,8 @@
 
-#include <veil/cache.hpp>
-#include <veil/model.hpp>
-#include <veil/drawable.hpp>
-#include <veil/log.hpp>
+#include <../../include/veil/cache.hpp>
+#include <../../include/veil/model.hpp>
+#include <../../include/veil/drawable.hpp>
+#include <../../include/veil/log.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -293,7 +293,7 @@ void ShaderStorage::loadShader(
     auto [insertedIt, success] = m_cache.try_emplace(name, sources);
 }
 
-const Shader* ShaderStorage::getShader(const std::string& name) const {
+const ShaderProgram* ShaderStorage::getShader(const std::string& name) const {
 
     auto it = m_cache.find(name);
 

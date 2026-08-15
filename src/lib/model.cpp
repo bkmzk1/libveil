@@ -1,7 +1,7 @@
 
-#include <veil/model.hpp>
-#include <veil/log.hpp>
-#include <veil/cache.hpp>
+#include <../../include/veil/model.hpp>
+#include <../../include/veil/log.hpp>
+#include <../../include/veil/cache.hpp>
 
 namespace veil {
 

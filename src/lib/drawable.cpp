@@ -1,6 +1,6 @@
 
-#include <veil/drawable.hpp>
-#include <veil/log.hpp>
+#include <../../include/veil/drawable.hpp>
+#include <../../include/veil/log.hpp>
 
 namespace veil {
 
@@ -52,7 +52,7 @@ void InstancedModels::setInstances(std::span<const Matrix4> instances) {
     glNamedBufferSubData(m_instancesVBO, 0, m_instancesCount * sizeof(Matrix4), &instances[0]);
 }
 
-void InstancedModels::setInstanceAttribute(const Shader& shader, std::string_view name) {
+void InstancedModels::setInstanceAttribute(const ShaderProgram& shader, std::string_view name) {
 
     GLint modelAttribLocation = glGetAttribLocation(shader.getID(), name.data());
 

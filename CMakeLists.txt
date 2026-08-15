@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(libveil VERSION 1.3.3 LANGUAGES CXX C)
+project(libveil VERSION 1.3.4 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,12 +17,28 @@ find_package(glfw3  CONFIG REQUIRED)
 find_package(glm    CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 
-add_library(glad STATIC vendor/glad/src/glad.c)
-set_target_properties(glad PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_include_directories(glad PUBLIC vendor/glad/include)
+add_library(
+    glad 
+    STATIC vendor/glad/src/glad.c
+)
+set_target_properties(
+    glad 
+    PROPERTIES 
+        POSITION_INDEPENDENT_CODE ON
+)
+target_include_directories(
+    glad 
+    PUBLIC vendor/glad/include
+)
 
-add_library(stb INTERFACE)
-target_include_directories(stb INTERFACE vendor/stb)
+add_library(
+    stb 
+    INTERFACE
+)
+target_include_directories(
+    stb 
+    INTERFACE vendor/stb
+)
 
 add_library(
     veil
@@ -56,21 +72,21 @@ target_include_directories(
 
 install(
     TARGETS veil 
-    EXPORT veilTargets
+    EXPORT  veilTargets
 )
 install(
-    DIRECTORY include/ vendor/stb/ vendor/glad/include/
+    DIRECTORY   include/ vendor/stb/ vendor/glad/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/veil_export.h
+    FILES       ${CMAKE_CURRENT_BINARY_DIR}/veil_export.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(
-    EXPORT veilTargets
-    FILE veilTargets.cmake
-    NAMESPACE veil::
+    EXPORT      veilTargets
+    FILE        veilTargets.cmake
+    NAMESPACE   veil::
     DESTINATION ${CMAKE_INSTALL_DATADIR}/veil
 )
 
@@ -80,6 +96,6 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_DATADIR}/veil
 )
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/veilConfig.cmake
+    FILES       ${CMAKE_CURRENT_BINARY_DIR}/veilConfig.cmake
     DESTINATION ${CMAKE_INSTALL_DATADIR}/veil
 )

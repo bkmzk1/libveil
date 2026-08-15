@@ -11,20 +11,20 @@
 
 namespace veil {
 
-class VEIL_EXPORT Shader {
+class VEIL_EXPORT ShaderProgram {
     public:
-        Shader() = default;
-        Shader(std::initializer_list<std::pair<std::string_view, GLenum>> sources);
+        ShaderProgram() = default;
+        ShaderProgram(std::initializer_list<std::pair<std::string_view, GLenum>> sources);
 
-        Shader(const Shader&) = delete;
-        Shader& operator=(const Shader&) = delete;
+        ShaderProgram(const ShaderProgram&) = delete;
+        ShaderProgram& operator=(const ShaderProgram&) = delete;
         
-        Shader(Shader&&) noexcept;
-        Shader& operator=(Shader&&) noexcept;
+        ShaderProgram(ShaderProgram&&) noexcept;
+        ShaderProgram& operator=(ShaderProgram&&) noexcept;
 
-        ~Shader();
+        ~ShaderProgram();
 
-        inline void useProgram() const { glUseProgram(m_shaderProgram); }
+        inline void useProgram() const { glUseProgram(m_shaderID); }
 
         void setUniform(int location, float x, float y, float z) const;
         void setUniform(int location, float x, float y) const;
@@ -33,10 +33,10 @@ class VEIL_EXPORT Shader {
         void setUniform(int location, const Vector2& vec) const;
         void setUniform(int location, const Matrix4& mat) const;
 
-        inline GLuint getID() const { return m_shaderProgram; }
+        inline GLuint getID() const { return m_shaderID; }
 
     private:
-        GLuint m_shaderProgram = 0;
-}; //class Shader
+        GLuint m_shaderID = 0;
+}; //class ShaderProgram
 
 }; //namespace veil

@@ -1,5 +1,6 @@
 
-#include <veil/glcamera.hpp>
+#include <../../include/veil/glcamera.hpp>
+
 namespace veil {
 
 GLCamera::GLCamera(const Vector3& initPos, const Vector3& up, float aspectRatio, float fovyDeg) {
@@ -7,23 +8,13 @@ GLCamera::GLCamera(const Vector3& initPos, const Vector3& up, float aspectRatio,
     m_position = initPos;
     m_up = up;
 
-    m_projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
-    m_view = Matrix4(1.0f);
+    m_attitude.projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
+    m_attitude.view = Matrix4(1.0f);
 
     m_lastx = 0.0f;
     m_lasty = 0.0f;
 
     m_viewDirty = true;
-}
-
-const Matrix4& GLCamera::getView() {
-    
-    if (m_viewDirty) {
-
-        m_viewDirty = false;
-        updateView(); 
-    } 
-    return m_view;
 }
 
 void GLCamera::calculateAttitude(double xpos, double ypos) {
@@ -56,12 +47,12 @@ void GLCamera::updateView() {
     Vector3 forward(x, y, z);
     m_front = forward.normalized();
 
-    m_view.makeView(m_position, m_position + m_front, m_up);
+    m_attitude.view.makeView(m_position, m_position + m_front, m_up);
 }
 
 void GLCamera::updateProjection(float fovyDeg, float aspectRatio) {
 
-    m_projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
+    m_attitude.projection.makeProjection(fovyDeg, aspectRatio, 0.1f, 500.0f);
 }
 
 void GLCamera::resyncMouse() {

@@ -34,14 +34,14 @@ class VEIL_EXPORT IDrawable {
     public:
         virtual ~IDrawable() = default;
 
-        void setCurrentShader(const Shader* shader) const { m_currentShader = shader; }
+        void setCurrentShader(const ShaderProgram* shader) const { m_currentShader = shader; }
         virtual void render() const = 0;
 
         virtual DrawableType getType() const = 0;
-        const Shader* getCurrentShader() const { return m_currentShader; }
+        const ShaderProgram* getCurrentShader() const { return m_currentShader; }
 
     protected:    
-        mutable const Shader* m_currentShader = nullptr;
+        mutable const ShaderProgram* m_currentShader = nullptr;
 }; //class IDrawable
 
 template<typename T>
@@ -87,7 +87,7 @@ class VEIL_EXPORT InstancedModels : public IDrawable {
         virtual ~InstancedModels();
 
         void setInstances(std::span<const Matrix4> instances);
-        void setInstanceAttribute(const Shader& shader, std::string_view attribName);
+        void setInstanceAttribute(const ShaderProgram& shader, std::string_view attribName);
         void render() const override;
 
         inline const Model& getBase() const { return m_base; }

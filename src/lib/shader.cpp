@@ -1,6 +1,6 @@
 
-#include <veil/shader.hpp>
-#include <veil/log.hpp>
+#include "../../include/veil/shader.hpp"
+#include "../../include/veil/log.hpp"
 
 #include <fstream>
 
@@ -19,12 +19,12 @@ static std::string readFile(const std::string& filename) {
     };
 }
 
-Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> sources) {
+ShaderProgram::ShaderProgram(std::initializer_list<std::pair<std::string_view, GLenum>> sources) {
 
     if (sources.size() == 0)
         throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to create an empty shader"));
 
-    m_shaderProgram = glCreateProgram();
+    m_shaderID = glCreateProgram();
 
     std::vector<GLuint> shaderIDs;
     shaderIDs.reserve(sources.size());
@@ -61,75 +61,75 @@ Shader::Shader(std::initializer_list<std::pair<std::string_view, GLenum>> source
                 throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to compile shader: {}", infoLog));
             }
 
-            glAttachShader(m_shaderProgram, shader);
+            glAttachShader(m_shaderID, shader);
         }
 
-        glLinkProgram(m_shaderProgram);
+        glLinkProgram(m_shaderID);
 
         GLint success;
-        glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
+        glGetProgramiv(m_shaderID, GL_LINK_STATUS, &success);
         if (!success) {
             
             GLchar infoLog[512];
-            glGetProgramInfoLog(m_shaderProgram, 512, nullptr, infoLog);
+            glGetProgramInfoLog(m_shaderID, 512, nullptr, infoLog);
             throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to link shader program: {}", infoLog));
         }
     }
     catch(...) {
         for (const auto& shader : shaderIDs)  {
 
-            glDetachShader(m_shaderProgram, shader);
+            glDetachShader(m_shaderID, shader);
             glDeleteShader(shader);
         }
-        glDeleteProgram(m_shaderProgram);
+        glDeleteProgram(m_shaderID);
         throw;
     }
 
     for (const auto& shader : shaderIDs) {
 
-        glDetachShader(m_shaderProgram, shader);
+        glDetachShader(m_shaderID, shader);
         glDeleteShader(shader);
     }
 }
-Shader::Shader(Shader&& other) noexcept {
+ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept {
 
-    m_shaderProgram = other.m_shaderProgram;
-    other.m_shaderProgram = 0;
+    m_shaderID = other.m_shaderID;
+    other.m_shaderID = 0;
 }
-Shader& Shader::operator=(Shader&& other) noexcept {
+ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept {
 
     if (this != &other) {
 
-        glDeleteProgram(m_shaderProgram);
+        glDeleteProgram(m_shaderID);
 
-        m_shaderProgram = other.m_shaderProgram;
+        m_shaderID = other.m_shaderID;
 
-        other.m_shaderProgram = 0;
+        other.m_shaderID = 0;
     }
     return *this;
 }
-Shader::~Shader() {
+ShaderProgram::~ShaderProgram() {
 
-    glDeleteProgram(m_shaderProgram);
+    glDeleteProgram(m_shaderID);
 }
 
-void Shader::setUniform(int location, float x, float y, float z) const {
-    glProgramUniform3f(m_shaderProgram, location, x, y, z);
+void ShaderProgram::setUniform(int location, float x, float y, float z) const {
+    glProgramUniform3f(m_shaderID, location, x, y, z);
 }
-void Shader::setUniform(int location, float x, float y) const {
-    glProgramUniform2f(m_shaderProgram, location, x, y);
+void ShaderProgram::setUniform(int location, float x, float y) const {
+    glProgramUniform2f(m_shaderID, location, x, y);
 }
-void Shader::setUniform(int location, const glm::mat4& mat) const {
-    glProgramUniformMatrix4fv(m_shaderProgram, location, 1, GL_FALSE, glm::value_ptr(mat));
+void ShaderProgram::setUniform(int location, const glm::mat4& mat) const {
+    glProgramUniformMatrix4fv(m_shaderID, location, 1, GL_FALSE, glm::value_ptr(mat));
 }
-void Shader::setUniform(int location, const Vector3& vec) const {
-    glProgramUniform3f(m_shaderProgram, location, vec.x, vec.y, vec.z);
+void ShaderProgram::setUniform(int location, const Vector3& vec) const {
+    glProgramUniform3f(m_shaderID, location, vec.x, vec.y, vec.z);
 }
-void Shader::setUniform(int location, const Vector2& vec) const {
-    glProgramUniform2f(m_shaderProgram, location, vec.x, vec.y);
+void ShaderProgram::setUniform(int location, const Vector2& vec) const {
+    glProgramUniform2f(m_shaderID, location, vec.x, vec.y);
 }
-void Shader::setUniform(int location, const Matrix4& mat) const {
-    glProgramUniformMatrix4fv(m_shaderProgram, location, 1, GL_FALSE, glm::value_ptr(static_cast<Matrix4::Base>(mat)));
+void ShaderProgram::setUniform(int location, const Matrix4& mat) const {
+    glProgramUniformMatrix4fv(m_shaderID, location, 1, GL_FALSE, glm::value_ptr(static_cast<Matrix4::Base>(mat)));
 }
 
 } //namespace veil

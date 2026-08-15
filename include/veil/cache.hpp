@@ -70,11 +70,11 @@ class VEIL_EXPORT ShaderStorage : public util::Singleton<ShaderStorage> {
 
         void loadShader(const std::string& name, std::initializer_list<std::pair<std::string_view, GLenum>> sources);
 
-        const Shader* getShader(const std::string& name) const;
+        const ShaderProgram* getShader(const std::string& name) const;
 
     private:
         ShaderStorage() = default;
-        std::unordered_map<std::string, Shader> m_cache;
+        std::unordered_map<std::string, ShaderProgram> m_cache;
 }; //class ShaderStorage
 
 }; //namespace veil

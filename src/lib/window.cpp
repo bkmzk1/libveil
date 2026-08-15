@@ -1,6 +1,6 @@
 
-#include <veil/window.hpp>
-#include <veil/log.hpp>
+#include <../../include/veil/window.hpp>
+#include <../../include/veil/log.hpp>
 
 #include <iostream>
 
