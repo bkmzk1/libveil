@@ -137,10 +137,13 @@ void ShaderProgram::setUniform(int location, const Matrix4& mat) const {
 
 UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept {
 
-    if (m_ubo) glDeleteBuffers(1, &m_ubo);
-
     m_ubo = other.m_ubo;
+    m_size = other.m_size;
+    m_location = other.m_location;
+
     other.m_ubo = 0;
+    other.m_size = 0;
+    other.m_location = 0;
 }
 UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept {
 
@@ -149,7 +152,12 @@ UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept {
         if (m_ubo) glDeleteBuffers(1, &m_ubo);
 
         m_ubo = other.m_ubo;
+        m_size = other.m_size;
+        m_location = other.m_location;
+
         other.m_ubo = 0;
+        other.m_size = 0;
+        other.m_location = 0;
     }   
     return *this;
 }

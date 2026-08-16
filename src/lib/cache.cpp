@@ -306,4 +306,25 @@ const ShaderProgram* ShaderStorage::getShader(const std::string& name) const {
     return &it->second;
 }
 
+UniformBufferStorage::~UniformBufferStorage() {
+    m_cache.clear();
+}
+void UniformBufferStorage::shutdown() {
+    m_cache.clear();
+}
+
+
+const UniformBuffer* UniformBufferStorage::getUBO(GLint bindingPoint) {
+
+    auto it = m_cache.find(bindingPoint);
+
+    if (it == m_cache.end()) {
+
+        std::cout << Log::message(LogType::WARNING, "Unable to find uniform buffer '{}'", bindingPoint) << std::endl;
+        return nullptr;
+    }
+
+    return &it->second;
+}
+
 }; //namespace veil

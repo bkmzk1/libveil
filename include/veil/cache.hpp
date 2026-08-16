@@ -77,4 +77,29 @@ class VEIL_EXPORT ShaderStorage : public util::Singleton<ShaderStorage> {
         std::unordered_map<std::string, ShaderProgram> m_cache;
 }; //class ShaderStorage
 
+class VEIL_EXPORT UniformBufferStorage : public util::Singleton<UniformBufferStorage> {
+
+    friend class util::Singleton<UniformBufferStorage>;
+
+    public:
+        ~UniformBufferStorage();
+        void shutdown();
+
+        template<typename T>
+        void loadUBO(GLint bindingPoint) {
+
+            auto it = m_cache.find(bindingPoint);
+            if (it != m_cache.end())
+                return;
+
+            m_cache.try_emplace(bindingPoint, UniformBuffer(bindingPoint, std::type_identity<T>()));
+        }
+
+        const UniformBuffer* getUBO(GLint bindingPoint);
+
+    private:
+        UniformBufferStorage() = default;
+        std::unordered_map<GLint, UniformBuffer> m_cache;
+}; //class UniformBufferStorage
+
 }; //namespace veil

@@ -60,7 +60,7 @@ void Renderer::callbackUniforms() const {
 
         for (const auto& [ubo, setter] : m_uniformBufferData) {
 
-            setter(*ubo);
+            setter(ubo);
         }
     }
 

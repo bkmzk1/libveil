@@ -104,21 +104,21 @@ class VEIL_EXPORT Renderer {
 
         std::unordered_map<
             const UniformBuffer*,
-            std::function<void(const UniformBuffer&)>
+            std::function<void(const UniformBuffer*)>
         > m_uniformBufferData;
 
         std::function<void(const ShaderProgram*, const IDrawable*)> m_forTargetFunc;
 
         template<typename T>
-        void addUniformBufferSetter(std::pair<const UniformBuffer&, T>&& target) {
+        void addUniformBufferSetter(std::pair<const UniformBuffer*, T>&& target) {
 
             auto provider = toProvider(std::forward<T>(target.second));
 
-            std::function<void(const UniformBuffer&)> setter =
-                [provider](const UniformBuffer& ubo) {
-                    ubo.setValue(provider());
+            std::function<void(const UniformBuffer*)> setter =
+                [provider](const UniformBuffer* ubo) {
+                    ubo->setValue(provider());
                 };
-            m_uniformBufferData.try_emplace(&target.first, std::move(setter));
+            m_uniformBufferData.try_emplace(target.first, std::move(setter));
         }
         void addUniformSetter(const ShaderProgram& shader,GLint loc,std::function<void(const ShaderProgram&, GLint)> setter);
 }; //class Renderer

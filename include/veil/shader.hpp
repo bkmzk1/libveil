@@ -84,7 +84,7 @@ class UniformBuffer {
     private:
         GLuint m_ubo = 0;
         unsigned int m_location = 0;
-        const GLint64 m_size = 0;
+        GLint64 m_size = 0;
 }; //class UniformBuffer
 
 }; //namespace veil
