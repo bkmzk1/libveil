@@ -313,7 +313,6 @@ void UniformBufferStorage::shutdown() {
     m_cache.clear();
 }
 
-
 const UniformBuffer* UniformBufferStorage::getUBO(GLint bindingPoint) {
 
     auto it = m_cache.find(bindingPoint);

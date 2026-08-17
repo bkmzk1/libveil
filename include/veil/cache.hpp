@@ -31,8 +31,8 @@ class VEIL_EXPORT TextureStorage : public util::Singleton<TextureStorage> {
     public:
         ~TextureStorage(); 
         void shutdown();
-        const Texture& loadTexture(const std::filesystem::path& path);
         
+        const Texture& loadTexture(const std::filesystem::path& path);
     private:
         TextureStorage() = default;
         std::unordered_map<std::filesystem::path, Texture> m_cache;
@@ -54,7 +54,6 @@ class VEIL_EXPORT ModelStorage : public util::Singleton<ModelStorage> {
         void loadFromBIN(Model& model);
 
         const Model& getModel(const std::filesystem::path& path) const;
-
     private:
         ModelStorage() = default;
         std::unordered_map<std::filesystem::path, Model> m_cache;
@@ -71,7 +70,6 @@ class VEIL_EXPORT ShaderStorage : public util::Singleton<ShaderStorage> {
         void loadShader(const std::string& name, std::initializer_list<std::pair<std::string_view, GLenum>> sources);
 
         const ShaderProgram* getShader(const std::string& name) const;
-
     private:
         ShaderStorage() = default;
         std::unordered_map<std::string, ShaderProgram> m_cache;
@@ -96,10 +94,14 @@ class VEIL_EXPORT UniformBufferStorage : public util::Singleton<UniformBufferSto
         }
 
         const UniformBuffer* getUBO(GLint bindingPoint);
-
     private:
         UniformBufferStorage() = default;
         std::unordered_map<GLint, UniformBuffer> m_cache;
 }; //class UniformBufferStorage
+
+template<typename T>
+inline auto& Storage() {
+    return T::getInstance();
+}
 
 }; //namespace veil
