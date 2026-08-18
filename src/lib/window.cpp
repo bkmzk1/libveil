@@ -46,6 +46,11 @@ Window::~Window() {
     glfwTerminate();
 }
 
+void Window::setInputMode(int mode, int value) {
+    
+    glfwSetInputMode(m_window, mode, value);
+}
+
 void Window::setUpdateCallback(std::function<void()>&& loopFunc) {
 
     m_loopFunc = std::move(loopFunc);

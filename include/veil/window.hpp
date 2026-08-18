@@ -48,7 +48,7 @@ class VEIL_EXPORT Window {
 
         ~Window(); 
 
-        inline void setInputMode(int mode, int value) { glfwSetInputMode(m_window, mode, value); }
+        void setInputMode(int mode, int value);
 
         void setUpdateCallback(std::function<void()>&& loopFunc);
         void setMouseCallback(std::function<void(double, double)>&& mouseFunc);
