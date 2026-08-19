@@ -33,7 +33,7 @@ Window::Window(std::string_view title, const Vector2& windowSize) {
     glfwMakeContextCurrent(m_window);
     glfwSetWindowUserPointer(m_window, this);
 
-    VEIL_INIT_OPENGL_DRV
+    initGL(this); // Needed to initialize glad inside the .so
 
     glViewport(0, 0, windowSize.x, windowSize.y);
 }

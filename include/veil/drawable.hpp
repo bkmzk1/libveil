@@ -30,11 +30,13 @@ struct DrawableTraits<Mesh> {
     static constexpr DrawableType type = DrawableType::MESH_SINGULAR;
 };
 
-class VEIL_EXPORT IDrawable {
+class VEIL_EXPORT Drawable {
     public:
-        virtual ~IDrawable() = default;
+        virtual ~Drawable() = default;
 
+        void setDrawingMode(int mode) { m_drawingMode = mode; }
         void setCurrentShader(const ShaderProgram* shader) const { m_currentShader = shader; }
+
         virtual void render() const = 0;
 
         virtual DrawableType getType() const = 0;
@@ -42,10 +44,11 @@ class VEIL_EXPORT IDrawable {
 
     protected:    
         mutable const ShaderProgram* m_currentShader = nullptr;
-}; //class IDrawable
+        mutable int m_drawingMode = GL_TRIANGLES;
+}; //class Drawable
 
 template<typename T>
-class Instance : public IDrawable {
+class Instance : public Drawable {
     public:
         Instance() = delete;
         inline Instance(const T& base) : m_base(base) { }
@@ -55,8 +58,7 @@ class Instance : public IDrawable {
 
         virtual ~Instance() = default;
 
-        inline void render() const override { m_base.render(); }
-
+        inline void render() const override { m_base.render(m_drawingMode); }
         inline void translate(const Vector3& translationVec) { m_modelMatrix.translate(translationVec); }
         inline void rotate(float deg, const Vector3& rotateDir) { m_modelMatrix.rotate(deg, rotateDir); }
         inline void scale(const Vector3& scaleRatio) { m_modelMatrix.scale(scaleRatio); }
@@ -73,7 +75,7 @@ class Instance : public IDrawable {
 using ModelInstance = Instance<Model>;
 using MeshInstance = Instance<Mesh>;
 
-class VEIL_EXPORT InstancedModels : public IDrawable {
+class VEIL_EXPORT InstancedModels : public Drawable {
     public:
         InstancedModels() = delete;
         InstancedModels(const Model& base, size_t maxInstances);

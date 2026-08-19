@@ -56,6 +56,9 @@ struct VEIL_EXPORT Texture {
 }; //struct Texture
 
 struct VEIL_EXPORT Material {
+
+    Material() = default;
+
     const Texture* diffuse = nullptr;
     const Texture* specular = nullptr;
 

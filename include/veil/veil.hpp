@@ -11,6 +11,3 @@
 #include "veil/renderer.hpp"
 #include "veil/math.hpp"
 #include "veil/drawable.hpp"
-
-//TODO: Make more idrawables
-//TODO: Texture atlases

@@ -5,7 +5,7 @@
 
 namespace veil {
 
-Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, Material& material) {
+Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material) {
 
     m_vertices = std::move(vertices);
     m_indices = std::move(indices);
@@ -78,7 +78,7 @@ Mesh::~Mesh() {
     if (m_ebo) glDeleteBuffers(1, &m_ebo);
 }
 
-void Mesh::render() const {
+void Mesh::render(int mode) const {
 
     if (m_material.diffuse)
         glBindTextureUnit(0, m_material.diffuse->id);
@@ -86,7 +86,7 @@ void Mesh::render() const {
         glBindTextureUnit(1, m_material.specular->id);
 
     glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(mode, m_indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 
@@ -96,10 +96,10 @@ Model::Model(const std::filesystem::path& path) {
     loadModel(path);
 }
 
-void Model::render() const {
+void Model::render(int mode) const {
 
     for (const auto& mesh : m_meshes) 
-        mesh.render();
+        mesh.render(mode);
 }
 
 void Model::loadModel(const std::filesystem::path& path) {

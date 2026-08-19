@@ -89,7 +89,7 @@ void InstancedModels::render() const {
         if (material.specular)
             glBindTextureUnit(1, material.specular->id);
 
-        glDrawElementsInstanced(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
+        glDrawElementsInstanced(m_drawingMode, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
     }
 }
 

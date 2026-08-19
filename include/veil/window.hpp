@@ -9,12 +9,11 @@
 #include <GLFW/glfw3.h>
 
 #include "math.hpp"
+#include "log.hpp"
 
 namespace veil {
 
-#define VEIL_INIT_OPENGL_DRV \
-    if (!gladLoadGL()) \
-        throw veil::Exception(veil::Log::message(veil::LogType::CRITICAL, "Failed to initialize GLAD"));
+// Needed to init glad in downstream executable
 
 using KeyArray = std::array<bool, GLFW_KEY_LAST + 1>;
 
@@ -84,5 +83,20 @@ class VEIL_EXPORT Window {
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 }; //class Window
+
+inline void initGL(const Window* window) {
+    if (window)
+        if (!gladLoadGL())
+            throw veil::Exception(veil::Log::message(veil::LogType::CRITICAL, "Failed to initialize GLAD"));
+}
+inline void toggleGLFlags(const Window* window, std::initializer_list<GLenum> flags, bool enable) {
+    if (!window)
+        return;
+
+    void (*action)(GLenum) = (enable) ? glEnable : glDisable;
+
+    for (auto flag : flags)
+        action(flag);
+}
 
 }; //namespace veil

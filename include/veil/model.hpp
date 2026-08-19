@@ -18,17 +18,17 @@ namespace veil {
 class VEIL_EXPORT Mesh {
     public:
         Mesh() = delete;
-        Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, Material& material);
+        Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material);
 
         Mesh(const Mesh&) = delete;
         Mesh& operator=(const Mesh&) = delete;
-        
+
         Mesh(Mesh&& other) noexcept;
         Mesh& operator=(Mesh&& other) noexcept;
         
         ~Mesh();
         
-        void render() const;
+        void render(int mode) const;
 
         inline const std::span<const Vertex> getVertices() const { return m_vertices; }
         inline const std::span<const unsigned int> getIndices() const { return m_indices; }
@@ -56,7 +56,7 @@ class VEIL_EXPORT Model {
 
         inline void setDirectory(const std::filesystem::path& path) { m_directory = path; }
         
-        void render() const; 
+        void render(int mode) const; 
         void loadModel(const std::filesystem::path& path);
 
         inline const std::filesystem::path& getDirectory() const { return m_directory; }

@@ -3,34 +3,28 @@
 
 namespace veil {
 
-void initRenderingFlags() {
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE); 
-}
-
 void Renderer::reserveShaders(const std::vector<const ShaderProgram*>& shaders) {
 
     for (const auto& shader : shaders) 
         m_renderData.try_emplace(shader, 0);
 }
 
-void Renderer::addTargets(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets) {
+void Renderer::addTargets(std::initializer_list<std::pair<const ShaderProgram&, const Drawable&>> targets) {
 
     for (const auto& target : targets) {
 
         const ShaderProgram* shader = &target.first;
-        const IDrawable* drawable = &target.second;
+        const Drawable* drawable = &target.second;
 
         m_renderData[shader].push_back(drawable);
         drawable->setCurrentShader(shader);
     }
 }
-void Renderer::changeTargetShader(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets) {
+void Renderer::changeTargetShader(std::initializer_list<std::pair<const ShaderProgram&, const Drawable&>> targets) {
 
     for (const auto& target : targets) {
 
-        const IDrawable* drawable = &target.second;
+        const Drawable* drawable = &target.second;
         const ShaderProgram* newShader = &target.first;
         const ShaderProgram* oldShader = drawable->getCurrentShader();
 
@@ -49,7 +43,7 @@ void Renderer::changeTargetShader(std::initializer_list<std::pair<const ShaderPr
     }
 }
 
-void Renderer::setForTargetCallback(std::function<void(const ShaderProgram*, const IDrawable*)>&& forModelFunc) {
+void Renderer::setForTargetCallback(std::function<void(const ShaderProgram*, const Drawable*)>&& forModelFunc) {
 
     m_forTargetFunc = std::move(forModelFunc);
 }

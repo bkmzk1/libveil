@@ -17,8 +17,6 @@
 
 namespace veil {
 
-VEIL_EXPORT void initRenderingFlags();
-
 template<typename T>
 static auto toProvider(T&& v) {
     
@@ -33,18 +31,17 @@ class VEIL_EXPORT Renderer {
         Renderer() = default;
         ~Renderer() = default;
 
-        void setForTargetCallback(std::function<void(const ShaderProgram*, const IDrawable*)>&& forTargetFunc);
+        void setForTargetCallback(std::function<void(const ShaderProgram*, const Drawable*)>&& forTargetFunc);
 
         void reserveShaders(const std::vector<const ShaderProgram*>& shaders);
-        void addTargets(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets);
-        void changeTargetShader(std::initializer_list<std::pair<const ShaderProgram&, const IDrawable&>> targets);
+        void addTargets(std::initializer_list<std::pair<const ShaderProgram&, const Drawable&>> targets);
+        void changeTargetShader(std::initializer_list<std::pair<const ShaderProgram&, const Drawable&>> targets);
 
         template<typename... Args>
         void uploadUniformBuffers(Args&&... targets) {
 
             (addUniformBufferSetter(std::forward<Args>(targets)), ...);
         }
-
         template<typename T> 
         void uploadUniform(const ShaderProgram& shader, std::string_view uniformName, T&& v) {
             
@@ -92,16 +89,16 @@ class VEIL_EXPORT Renderer {
         inline const auto& getUniformData() const { return m_uniformData; }
 
     private:
-        std::function<void(const ShaderProgram*, const IDrawable*)> m_forTargetFunc;
+        std::function<void(const ShaderProgram*, const Drawable*)> m_forTargetFunc;
 
         std::unordered_map<
             const ShaderProgram*, 
-            std::vector<const IDrawable*> 
+            std::vector<const Drawable*> 
         > m_renderData;
 
         std::unordered_map<
             const ShaderProgram*, 
-            std::vector<std::pair<GLint, std::function<void(const ShaderProgram&, GLint)> > >
+            std::vector<std::pair<GLint, std::function<void(const ShaderProgram&, GLint)>>>
         > m_uniformData;
 
         std::unordered_map<
@@ -120,7 +117,6 @@ class VEIL_EXPORT Renderer {
                 };
             m_uniformBufferData.try_emplace(target.first, std::move(setter));
         }
-
         void addUniformSetter(const ShaderProgram& shader,GLint loc,std::function<void(const ShaderProgram&, GLint)> setter);
 }; //class Renderer
 
