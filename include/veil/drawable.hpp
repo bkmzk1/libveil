@@ -48,6 +48,11 @@ class VEIL_EXPORT Drawable {
 }; //class Drawable
 
 template<typename T>
+concept cRenderable = requires(T x, int mode) {
+    x.render(mode);
+};
+
+template<cRenderable T>
 class Instance : public Drawable {
     public:
         Instance() = delete;

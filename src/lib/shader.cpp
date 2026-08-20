@@ -116,15 +116,6 @@ ShaderProgram::~ShaderProgram() {
     if (m_shaderID) glDeleteProgram(m_shaderID);
 }
 
-void ShaderProgram::setUniform(int location, float x, float y, float z) const {
-    glProgramUniform3f(m_shaderID, location, x, y, z);
-}
-void ShaderProgram::setUniform(int location, float x, float y) const {
-    glProgramUniform2f(m_shaderID, location, x, y);
-}
-void ShaderProgram::setUniform(int location, const glm::mat4& mat) const {
-    glProgramUniformMatrix4fv(m_shaderID, location, 1, GL_FALSE, glm::value_ptr(mat));
-}
 void ShaderProgram::setUniform(int location, const Vector3& vec) const {
     glProgramUniform3f(m_shaderID, location, vec.x, vec.y, vec.z);
 }

@@ -13,8 +13,6 @@
 
 namespace veil {
 
-// Needed to init glad in downstream executable
-
 using KeyArray = std::array<bool, GLFW_KEY_LAST + 1>;
 
 struct VEIL_EXPORT KeyEvents {

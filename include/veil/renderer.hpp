@@ -42,7 +42,7 @@ class VEIL_EXPORT Renderer {
 
             (addUniformBufferSetter(std::forward<Args>(targets)), ...);
         }
-        template<typename T> 
+        template<cUniform T> 
         void uploadUniform(const ShaderProgram& shader, std::string_view uniformName, T&& v) {
             
             GLint location = glGetUniformLocation(shader.getID(), uniformName.data());
@@ -60,7 +60,7 @@ class VEIL_EXPORT Renderer {
                 };
             addUniformSetter(shader, location, std::move(setter));
         }
-        template<typename T>
+        template<cUniform T>
         void uploadUniformUniversal(std::string_view uniformName, const T& v) {
 
             for (const auto& data : m_renderData) {
@@ -69,7 +69,7 @@ class VEIL_EXPORT Renderer {
                 uploadUniform(*data.first, uniformName, v);
             }
         }
-        template<typename T>
+        template<cUniform T>
         void uploadUniformDirect(const ShaderProgram& shader, std::string_view uniformName, const T& v) {
             
             GLint location = glGetUniformLocation(shader.getID(), uniformName.data());

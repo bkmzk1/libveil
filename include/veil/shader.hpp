@@ -30,9 +30,6 @@ class VEIL_EXPORT ShaderProgram {
 
         inline void useProgram() const { glUseProgram(m_shaderID); }
 
-        void setUniform(int location, float x, float y, float z) const;
-        void setUniform(int location, float x, float y) const;
-        void setUniform(int location, const glm::mat4& mat) const;
         void setUniform(int location, const Vector3& vec) const;
         void setUniform(int location, const Vector2& vec) const;
         void setUniform(int location, const Matrix4& mat) const;
@@ -42,6 +39,11 @@ class VEIL_EXPORT ShaderProgram {
     private:
         GLuint m_shaderID = 0;
 }; //class ShaderProgram
+
+template<typename T>
+concept cUniform = std::is_convertible_v<std::decay_t<T>, Vector3> ||
+                   std::is_convertible_v<std::decay_t<T>, Vector2> ||
+                   std::is_convertible_v<std::decay_t<T>, Matrix4>;
 
 class UniformBuffer {
     public:

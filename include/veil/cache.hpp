@@ -5,6 +5,7 @@
 
 #include <unordered_map>
 #include <filesystem>
+#include <concepts>
 
 #include "assets.hpp"
 #include "model.hpp"
@@ -100,6 +101,9 @@ class VEIL_EXPORT UniformBufferStorage : public util::Singleton<UniformBufferSto
 }; //class UniformBufferStorage
 
 template<typename T>
+concept cStorage = std::derived_from<T, util::Singleton<T>>;
+
+template<cStorage T>
 inline auto& Storage() {
     return T::getInstance();
 }
