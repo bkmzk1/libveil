@@ -13,6 +13,8 @@
 
 namespace veil {
 
+inline constexpr unsigned int g_primitiveRestartIndex = 0xFFFFFFFF;
+
 using KeyArray = std::array<bool, GLFW_KEY_LAST + 1>;
 
 struct VEIL_EXPORT KeyEvents {
@@ -83,9 +85,12 @@ class VEIL_EXPORT Window {
 }; //class Window
 
 inline void initGL(const Window* window) {
-    if (window)
+    if (window) {
         if (!gladLoadGL())
             throw veil::Exception(veil::Log::message(veil::LogType::CRITICAL, "Failed to initialize GLAD"));
+
+        glPrimitiveRestartIndex(g_primitiveRestartIndex);
+    }
 }
 inline void toggleGLFlags(const Window* window, std::initializer_list<GLenum> flags, bool enable) {
     if (!window)
