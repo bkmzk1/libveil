@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(libveil VERSION 2.0.0 LANGUAGES CXX C)
+project(libveil VERSION 2.2.1 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -49,7 +49,6 @@ add_library(
            src/lib/cache.cpp
            src/lib/log.cpp
            src/lib/renderer.cpp
-           src/lib/drawable.cpp
 )
 
 target_compile_definitions(

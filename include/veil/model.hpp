@@ -30,6 +30,7 @@ class VEIL_EXPORT Mesh {
         
         void render(int mode) const;
 
+        inline std::span<const Mesh> getMeshesRead() const { return { this, 1 }; }
         inline const std::span<const Vertex> getVertices() const { return m_vertices; }
         inline const std::span<const unsigned int> getIndices() const { return m_indices; }
         inline const Material& getMaterial() const { return m_material; }
