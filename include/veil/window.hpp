@@ -53,6 +53,7 @@ class VEIL_EXPORT Window {
         void setMouseCallback(std::function<void(double, double)>&& mouseFunc);
         void setFramebufferCallback(std::function<void()>&& framebufferFunc);
         void setKeyCallback(std::function<void(const KeyEvents&)>&& keyFunc);
+        void setScrollCallback(std::function<void(double, double)>&& scrollFunc);
 
         inline bool shouldClose() const { return glfwWindowShouldClose(m_window); }
         inline void pollEvents()  const { glfwPollEvents(); }
@@ -75,12 +76,14 @@ class VEIL_EXPORT Window {
         std::function<void(double, double)> m_mouseFunc;
         std::function<void()> m_framebufferFunc;
         std::function<void(const KeyEvents&)> m_keyFunc;
+        std::function<void(double, double)> m_scrollFunc;
 
         KeyEvents m_keyEvents{.keysDown={false}, .keysPressed={false}};
 
         static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
         static void framebufferCallback(GLFWwindow* window, int width, int height);
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void scrollCallback(GLFWwindow* window, double xoff, double yoff);
 
 }; //class Window
 

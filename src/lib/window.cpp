@@ -70,6 +70,11 @@ void Window::setKeyCallback(std::function<void(const KeyEvents&)>&& keyFunc) {
     m_keyFunc = std::move(keyFunc);
     glfwSetKeyCallback(m_window, &Window::keyCallback);
 }
+void Window::setScrollCallback(std::function<void(double, double)>&& scrollFunc) {
+
+    m_scrollFunc = std::move(scrollFunc);
+    glfwSetScrollCallback(m_window, &Window::scrollCallback);
+}
 
 int Window::startUpdateLoop() {
 
@@ -139,6 +144,13 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
     }
     else if (action == GLFW_RELEASE)
         win->m_keyEvents.keysDown[key] = false;
+}
+void Window::scrollCallback(GLFWwindow* window, double xoff, double yoff) {
+
+    const Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    if (win && win->m_scrollFunc)
+        win->m_scrollFunc(xoff, yoff);
 }
 
 }; //namespace veil
