@@ -80,8 +80,11 @@ Mesh::~Mesh() {
 
 void Mesh::setData(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
 
-    glNamedBufferData(m_vbo, sizeof(Vertex) * vertices.size(), vertices.data(), GL_DYNAMIC_DRAW);
-    glNamedBufferData(m_ebo, sizeof(unsigned int) * indices.size(), indices.data(), GL_DYNAMIC_DRAW);
+    glNamedBufferData(m_vbo, sizeof(Vertex) * vertices.size(), nullptr, GL_DYNAMIC_DRAW);
+    glNamedBufferData(m_ebo, sizeof(unsigned int) * indices.size(), nullptr, GL_DYNAMIC_DRAW);
+
+    glNamedBufferSubData(m_vbo, 0, sizeof(Vertex) * vertices.size(), vertices.data());
+    glNamedBufferSubData(m_ebo, 0, sizeof(unsigned int) * indices.size(), indices.data());
 
     m_vertices = vertices;
     m_indices = indices;
