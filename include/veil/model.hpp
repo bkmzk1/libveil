@@ -28,6 +28,8 @@ class VEIL_EXPORT Mesh {
         
         ~Mesh();
         
+        void setData(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+
         void render(int mode) const;
 
         inline std::span<const Mesh> getMeshesRead() const { return { this, 1 }; }

@@ -15,10 +15,10 @@ Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, 
     glCreateBuffers(1, &m_vbo);
     glCreateBuffers(1, &m_ebo);
 
-    glNamedBufferStorage(m_vbo, m_vertices.size()*sizeof(Vertex), &m_vertices[0], 0);
+    glNamedBufferStorage(m_vbo, m_vertices.size()*sizeof(Vertex), m_vertices.data(), GL_DYNAMIC_STORAGE_BIT);
     glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, sizeof(Vertex));
 
-    glNamedBufferStorage(m_ebo, m_indices.size()*sizeof(unsigned int), &m_indices[0], 0);
+    glNamedBufferStorage(m_ebo, m_indices.size()*sizeof(unsigned int), m_indices.data(), GL_DYNAMIC_STORAGE_BIT);
     glVertexArrayElementBuffer(m_vao, m_ebo);
 
     glEnableVertexArrayAttrib(m_vao, 0);
@@ -76,6 +76,15 @@ Mesh::~Mesh() {
     if (m_vao) glDeleteVertexArrays(1, &m_vao);
     if (m_vbo) glDeleteBuffers(1, &m_vbo);
     if (m_ebo) glDeleteBuffers(1, &m_ebo);
+}
+
+void Mesh::setData(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
+
+    glNamedBufferData(m_vbo, sizeof(Vertex) * vertices.size(), vertices.data(), GL_DYNAMIC_DRAW);
+    glNamedBufferData(m_ebo, sizeof(unsigned int) * indices.size(), indices.data(), GL_DYNAMIC_DRAW);
+
+    m_vertices = vertices;
+    m_indices = indices;
 }
 
 void Mesh::render(int mode) const {
