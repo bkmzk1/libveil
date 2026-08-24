@@ -7,6 +7,9 @@ namespace veil {
 
 LogTimer::LogTimer(std::string_view name, std::source_location loc) {
 
+    if (!m_enabled)
+        return;
+
     m_name = name;
     m_location = loc;
     m_startTimePoint = std::chrono::steady_clock::now();
@@ -16,6 +19,9 @@ LogTimer::LogTimer(std::string_view name, std::source_location loc) {
 }
 
 LogTimer::~LogTimer() {
+
+    if (!m_enabled)
+        return;
 
     const std::chrono::steady_clock::time_point endTimePoint = std::chrono::steady_clock::now();
     const auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTimePoint - m_startTimePoint);

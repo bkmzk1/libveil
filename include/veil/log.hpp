@@ -56,7 +56,12 @@ class VEIL_EXPORT LogTimer {
     public:
         LogTimer(std::string_view name, std::source_location loc = std::source_location::current());
         ~LogTimer();
+
+        inline static void toggle(bool enabled) { m_enabled = enabled; }
+
     private:
+        inline static bool m_enabled = true;
+
         std::string m_name;
         std::source_location m_location;
         std::chrono::steady_clock::time_point m_startTimePoint;
