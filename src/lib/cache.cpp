@@ -55,7 +55,8 @@ GLuint TextureStorage::loadTextureFromFile(const std::filesystem::path& path) {
     if (!data) {
 
         stbi_image_free(data);
-        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load texture at {}", path.string()));
+        throw veil::Exception(Log::message(LogType::CRITICAL, "Failed to load texture at {}, {}", 
+                                           path.string(), stbi_failure_reason()));
         return 0;
     }
 
