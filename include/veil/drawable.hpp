@@ -6,6 +6,7 @@
 #include "assets.hpp"
 #include "shader.hpp"
 #include "model.hpp"
+#include "text.hpp"
 
 namespace veil {
 
@@ -15,7 +16,9 @@ enum class DrawableType : uint8_t {
     MESH_SINGULAR,
     MESH_INSTANCED,
     MODEL_SINGULAR,
-    MODEL_INSTANCED
+    MODEL_INSTANCED,
+    TEXT_SINGULAR,
+    TEXT_INSTANCED
 }; //enum class DrawableType
 
 template<typename T> 
@@ -32,6 +35,11 @@ template<>
 struct DrawableTraits<Model> {
     static constexpr DrawableType singularType = DrawableType::MODEL_SINGULAR;
     static constexpr DrawableType instancedType = DrawableType::MODEL_INSTANCED;
+};
+template<>
+struct DrawableTraits<Text> {
+    static constexpr DrawableType singularType = DrawableType::TEXT_SINGULAR;
+    static constexpr DrawableType instancedType = DrawableType::TEXT_INSTANCED;
 };
 
 class VEIL_EXPORT Drawable {
@@ -84,6 +92,7 @@ class Instance : public Drawable {
 
 using ModelInstance = Instance<Model>;
 using MeshInstance = Instance<Mesh>;
+using TextInstance = Instance<Text>;
 
 template<cRenderable T>
 class InstanceRendered : public Drawable {
@@ -190,5 +199,6 @@ class InstanceRendered : public Drawable {
 
 using InstancedModel = InstanceRendered<Model>;
 using InstancedMesh = InstanceRendered<Mesh>;
+using InstancedText = InstanceRendered<Text>;
     
 } //namespace veil

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(libveil VERSION 2.3.2 LANGUAGES CXX C)
+project(libveil VERSION 2.5.1 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -49,6 +49,7 @@ add_library(
            src/lib/cache.cpp
            src/lib/log.cpp
            src/lib/renderer.cpp
+           src/lib/text.cpp
 )
 
 target_compile_definitions(
@@ -67,6 +68,7 @@ generate_export_header(veil BASE_NAME veil)
 target_include_directories(
     veil PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>
                 $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor>
 )
 
 install(
@@ -74,7 +76,7 @@ install(
     EXPORT  veilTargets
 )
 install(
-    DIRECTORY   include/ vendor/stb/ vendor/glad/include/
+    DIRECTORY   include/ vendor/stb vendor/glad/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

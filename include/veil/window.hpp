@@ -101,8 +101,13 @@ inline void toggleGLFlags(const Window* window, std::initializer_list<GLenum> fl
 
     void (*action)(GLenum) = (enable) ? glEnable : glDisable;
 
-    for (auto flag : flags)
+    for (auto flag : flags) {
+
         action(flag);
+
+        if (flag == GL_BLEND && enable)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 }
 
 }; //namespace veil
