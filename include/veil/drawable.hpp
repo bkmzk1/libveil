@@ -169,6 +169,9 @@ class InstanceRendered : public Drawable {
         
         void render() const override {
 
+            if constexpr (std::is_same_v<T, Text>) 
+                glDisable(GL_CULL_FACE);
+
             for (const auto& mesh : m_base.getMeshesRead()) {
 
                 const Material& material = mesh.getMaterial();
@@ -182,6 +185,9 @@ class InstanceRendered : public Drawable {
 
                 glDrawElementsInstanced(m_drawingMode, mesh.getIndices().size(), GL_UNSIGNED_INT, nullptr, m_instancesCount);
             }
+
+            if constexpr (std::is_same_v<T, Text>) 
+                glEnable(GL_CULL_FACE);
         }
 
         inline const T& getBase() const { return m_base; }

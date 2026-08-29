@@ -55,10 +55,13 @@ Font::~Font() {
 
 Text::Text(const Font& font) : m_font(font) {
 
+    Material fontMaterial{};
+    fontMaterial.diffuse = &font.getTexture();
+
     m_mesh = std::make_unique<Mesh>(
         std::vector<Vertex>{},
         std::vector<unsigned int>{},
-        Material{}
+        fontMaterial
     );
 }
 

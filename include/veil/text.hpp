@@ -29,7 +29,9 @@ class Font {
 
         std::span<const unsigned char> getBitmap() const { return m_bitmap; }
         std::span<const stbtt_bakedchar> getCharData() const { return m_charData; }
+        
         GLuint getTextureID() const { if (m_texture) return m_texture->id; else return 0; }
+        const Texture& getTexture() const { return *m_texture; }
 
     private:
         std::vector<unsigned char> m_bitmap;
