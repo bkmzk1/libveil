@@ -75,6 +75,11 @@ void Window::setScrollCallback(std::function<void(double, double)>&& scrollFunc)
     m_scrollFunc = std::move(scrollFunc);
     glfwSetScrollCallback(m_window, &Window::scrollCallback);
 }
+void Window::setMouseButtonCallback(std::function<void(const KeyEvents&)>&& mouseBtnFunc) {
+
+    m_mouseBtnFunc = std::move(mouseBtnFunc);
+    glfwSetMouseButtonCallback(m_window, &Window::mouseButtonCallback);
+}
 
 int Window::startUpdateLoop() {
 
@@ -92,8 +97,11 @@ int Window::startUpdateLoop() {
         try {
             if (m_keyFunc)
                 m_keyFunc(m_keyEvents);
+            if (m_mouseBtnFunc)
+                m_mouseBtnFunc(m_mouseBtnEvents);
 
             std::fill(std::begin(m_keyEvents.keysPressed), std::end(m_keyEvents.keysPressed), false);
+            std::fill(std::begin(m_mouseBtnEvents.keysPressed), std::end(m_mouseBtnEvents.keysPressed), false);
 
             m_loopFunc();
         }
@@ -145,6 +153,18 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
     else if (action == GLFW_RELEASE)
         win->m_keyEvents.keysDown[key] = false;
 }
+void Window::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+
+    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    if (action == GLFW_PRESS) {
+        win->m_mouseBtnEvents.keysDown[button] = true;
+        win->m_mouseBtnEvents.keysPressed[button] = true;
+    }
+    else if (action == GLFW_RELEASE)
+        win->m_mouseBtnEvents.keysDown[button] = false;
+}
+
 void Window::scrollCallback(GLFWwindow* window, double xoff, double yoff) {
 
     const Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
