@@ -13,12 +13,10 @@ namespace veil {
 enum class DrawableType : uint8_t {
 
     UNKNOWN,
-    MESH_SINGULAR,
-    MESH_INSTANCED,
-    MODEL_SINGULAR,
-    MODEL_INSTANCED,
-    TEXT_SINGULAR,
-    TEXT_INSTANCED
+    
+    MESH_SINGULAR,  MESH_INSTANCED,
+    MODEL_SINGULAR, MODEL_INSTANCED,
+    TEXT_SINGULAR,  TEXT_INSTANCED
 }; //enum class DrawableType
 
 template<typename T> 

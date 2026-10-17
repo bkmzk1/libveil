@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include <utility>
 #include <type_traits>
+#include <typeindex>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -47,10 +48,10 @@ concept cUniform = std::is_convertible_v<std::decay_t<T>, Vector3> ||
 
 class UniformBuffer {
     public:
-        UniformBuffer() = default;
+        UniformBuffer() = delete;
 
         template<typename T>
-        UniformBuffer(unsigned int location, std::type_identity<T>) : m_size(sizeof(T)) {
+        UniformBuffer(unsigned int location, std::type_identity<T>) : m_type(typeid(T)) {
 
             GLuint ubo;
             glCreateBuffers(1, &ubo);
@@ -69,13 +70,14 @@ class UniformBuffer {
 
         ~UniformBuffer();
 
-        //FIXME: Catch the type error, not the size error 
         template<typename T>
         void setValue(const T& value) const {
 
-            if (m_size != sizeof(value))
-                throw veil::Exception(Log::message(LogType::CRITICAL, "Buffer size '{}' does not match value size '{}'", 
-                                      m_size, sizeof(value)));
+            std::type_index typeIDT = typeid(T);
+
+            if (m_type != typeIDT)
+            throw veil::Exception(Log::message(LogType::CRITICAL, "Buffer type '{}' does not match value type '{}'", 
+                                      m_type.name(), typeIDT.name()));
 
             glNamedBufferSubData(m_ubo, 0, sizeof(value), &value);
         }
@@ -86,7 +88,7 @@ class UniformBuffer {
     private:
         GLuint m_ubo = 0;
         unsigned int m_location = 0;
-        GLint64 m_size = 0;
+        std::type_index m_type;
 }; //class UniformBuffer
 
 }; //namespace veil

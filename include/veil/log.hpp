@@ -58,7 +58,6 @@ class VEIL_EXPORT LogTimer {
         ~LogTimer();
 
         inline static void toggle(bool enabled) { m_enabled = enabled; }
-
     private:
         inline static bool m_enabled = true;
 

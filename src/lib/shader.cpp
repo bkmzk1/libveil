@@ -126,14 +126,12 @@ void ShaderProgram::setUniform(int location, const Matrix4& mat) const {
     glProgramUniformMatrix4fv(m_shaderID, location, 1, GL_FALSE, glm::value_ptr(static_cast<Matrix4::Base>(mat)));
 }
 
-UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept {
+UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept : m_type(other.m_type) {
 
     m_ubo = other.m_ubo;
-    m_size = other.m_size;
     m_location = other.m_location;
 
     other.m_ubo = 0;
-    other.m_size = 0;
     other.m_location = 0;
 }
 UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept {
@@ -143,11 +141,10 @@ UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept {
         if (m_ubo) glDeleteBuffers(1, &m_ubo);
 
         m_ubo = other.m_ubo;
-        m_size = other.m_size;
+        m_type = other.m_type;
         m_location = other.m_location;
 
         other.m_ubo = 0;
-        other.m_size = 0;
         other.m_location = 0;
     }   
     return *this;

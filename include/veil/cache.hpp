@@ -18,10 +18,10 @@ inline const std::filesystem::path g_cacheDir  = ".cache";
 
 struct BINCacheHeader {
 
-    size_t diffLen = 0;
-    size_t specLen = 0;
-    size_t vertCount = 0;
-    size_t indCount = 0;
+    size_t diffLen = 0u;
+    size_t specLen = 0u;
+    size_t vertCount = 0u;
+    size_t indCount = 0u;
 
 }; //struct BINCacheHeader
 
