@@ -2,12 +2,11 @@
 ## A wrapper for GLFW, OpenGL and Assimp with caching.
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B-00599C?logo=cplusplus&logoColor=white)
-![Platform](https://img.shields.io/badge/platform-Fedora%20Linux-51A2DA?logo=fedora&logoColor=white)
 ![License](https://img.shields.io/badge/license-Unlicense-blue)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
 
 > [!IMPORTANT]
-> Development and testing currently target Fedora 44 exclusively. Other operating systems (Windows, BSD, macOS, etc.) are untested and unsupported at this time — compatibility is not guaranteed
+> Development and testing currently target Linux exclusively. Other operating systems (Windows, BSD, macOS, etc.) are untested and unsupported at this time — compatibility is not guaranteed
 
 ### Building from source
 
@@ -20,8 +19,8 @@
 - Assimp
 
 ```sh
-# Installing dependencies on Fedora 44
-sudo dnf install glfw glfw-devel glm-devel assimp assimp-devel
+# Installing dependencies on Arch Linux
+sudo pacman -S glfw glm assimp
 ```
 
 #### Compilation steps
@@ -34,7 +33,7 @@ cmake -B build -S .
 cmake --build build --config Release  
 
 # (Optional) Install headers and binaries to a target directory
-cmake --install build
+sudo cmake --install build
 ```
 
 ### Integration and usage
