@@ -2,8 +2,9 @@
 ## A wrapper for GLFW, OpenGL and Assimp with caching.
 
 ![Language](https://img.shields.io/badge/language-C%2B%2B-00599C?logo=cplusplus&logoColor=white)
-![License](https://img.shields.io/badge/license-Unlicense-blue)
+![Platform](https://img.shields.io/badge/platform-Linux-27272a?logo=linux&logoColor=white)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/license-Unlicense-blue)
 
 > [!IMPORTANT]
 > Development and testing currently target Linux exclusively. Other operating systems (Windows, BSD, macOS, etc.) are untested and unsupported at this time — compatibility is not guaranteed
